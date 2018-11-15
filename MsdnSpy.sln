@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MsdnSpy.Logic", "MsdnSpy.Lo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MsdnSpy.Database", "MsdnSpy.Database\MsdnSpy.Database.csproj", "{6E530A73-4AF0-44E2-89AC-AD804BBDE4D9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MsdnSpy.Server", "MsdnSpy.Server\MsdnSpy.Server.csproj", "{419A5079-6B7B-455C-A7BC-C7633411A9CC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{6E530A73-4AF0-44E2-89AC-AD804BBDE4D9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6E530A73-4AF0-44E2-89AC-AD804BBDE4D9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6E530A73-4AF0-44E2-89AC-AD804BBDE4D9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{419A5079-6B7B-455C-A7BC-C7633411A9CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{419A5079-6B7B-455C-A7BC-C7633411A9CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{419A5079-6B7B-455C-A7BC-C7633411A9CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{419A5079-6B7B-455C-A7BC-C7633411A9CC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

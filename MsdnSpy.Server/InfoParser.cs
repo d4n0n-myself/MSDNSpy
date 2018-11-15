@@ -7,7 +7,7 @@ using System.Xml.Linq;
 using Microsoft.EntityFrameworkCore.Internal;
 using Newtonsoft.Json;
 
-namespace MsdnSpy.Bot
+namespace MsdnSpy.Server
 {
     public class InfoParser
     {

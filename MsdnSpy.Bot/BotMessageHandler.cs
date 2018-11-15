@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net;
+using System.Text;
+using MsdnSpy.Server;
 using Telegram.Bot;
 using Telegram.Bot.Args;
 using Telegram.Bot.Types.ReplyMarkups;
@@ -22,6 +25,9 @@ namespace MsdnSpy.Bot
 				Console.WriteLine(e.Message);
 				return;
 			}
+			
+			//var requestAnswer = SendRequest(args);
+			
 			try
 			{
 				Console.WriteLine($"{DateTime.UtcNow} UTC: Hello from {args.Message.Chat.Username}");
@@ -61,5 +67,17 @@ namespace MsdnSpy.Bot
 
 			Console.WriteLine($"{DateTime.UtcNow}: Handled.");
 		}
+
+		private static string SendRequest(MessageEventArgs args)
+		{
+			
+			var request = WebRequest.Create($"http://localhost:1234/?query={args.Message.Text}");
+			var response = request.GetResponse();
+			
+			var buffer = new byte[100];
+			response.GetResponseStream().Read(buffer, 0, 100);
+			return buffer.Length != 0 ? Encoding.ASCII.GetString(buffer) : string.Empty;
+		}
+		
 	}
 }
