@@ -3,11 +3,12 @@ using com.LandonKey.SocksWebProxy.Proxy;
 using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 using Telegram.Bot;
 
 namespace MsdnSpy.Bot
-{
+{	
 	internal static class Program
 	{
 		private static readonly List<ITelegramBotClient> Bots = new List<ITelegramBotClient>();
@@ -18,7 +19,7 @@ namespace MsdnSpy.Bot
 			StartBots();
 			HandleConsoleInput();
 		}
-
+		
 		private static void InitializeBots()
 		{
 			var settings = Configuration.BotSettings;
@@ -64,9 +65,10 @@ namespace MsdnSpy.Bot
 		{
 			while (true)
 			{
-				var input = Console.ReadLine();
-				if (!CommandHandler.Handle(input))
-					return;
+//				var input = Console.ReadLine();
+//				if (!CommandHandler.Handle(input))
+//					return;
+				Thread.Sleep(100);
 			}
 		}
 	}
