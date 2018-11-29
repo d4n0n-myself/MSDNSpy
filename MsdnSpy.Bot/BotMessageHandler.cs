@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Text;
-using MsdnSpy.Server;
 using Telegram.Bot;
 using Telegram.Bot.Args;
 using Telegram.Bot.Types.ReplyMarkups;
+using MsdnSpy.Logic;
 
 namespace MsdnSpy.Bot
 {

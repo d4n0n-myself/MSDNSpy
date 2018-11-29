@@ -4,10 +4,9 @@ using System.Linq;
 using System.Net;
 using System.Xml;
 using System.Xml.Linq;
-using Microsoft.EntityFrameworkCore.Internal;
 using Newtonsoft.Json;
 
-namespace MsdnSpy.Server
+namespace MsdnSpy.Logic
 {
     public class InfoParser
     {
@@ -59,7 +58,8 @@ namespace MsdnSpy.Server
                     var name = el.Name.LocalName + "." + innerEl.Name.LocalName;
                     dic.Add(name, innerEl.Value);
                 }
-                var xw = el.Attributes().Select(x => string.Format("{0} {1}", x.Name, x.Value)).Join(" ");
+
+                var xw = el.Attributes().Select(x => $"{x.Name} {x.Value}").Aggregate((x, y) => x + " " + y);
                 dic.Add(el.Name.LocalName, xw);
             }
         }

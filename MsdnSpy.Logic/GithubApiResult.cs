@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using Newtonsoft.Json;
 
-namespace MsdnSpy.Server
+namespace MsdnSpy.Logic
 {
     public class GithubApiResult
     {

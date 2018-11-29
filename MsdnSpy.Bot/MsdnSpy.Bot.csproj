@@ -22,7 +22,6 @@
   <ItemGroup>
     <ProjectReference Include="..\MsdnSpy.Database\MsdnSpy.Database.csproj" />
     <ProjectReference Include="..\MsdnSpy.Logic\MsdnSpy.Logic.csproj" />
-    <ProjectReference Include="..\MsdnSpy.Server\MsdnSpy.Server.csproj" />
   </ItemGroup>
 
 </Project>

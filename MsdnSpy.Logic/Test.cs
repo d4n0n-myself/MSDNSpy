@@ -4,7 +4,7 @@ using System.IO;
 using System.Net;
 using Newtonsoft.Json;
 
-namespace MsdnSpy.Server
+namespace MsdnSpy.Logic
 {
     public class Test
     {
