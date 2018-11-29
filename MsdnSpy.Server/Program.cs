@@ -8,7 +8,7 @@ namespace MsdnSpy.Server
     {
         public static void Main(string[] args)
         {
-            CreateWebHostBuilder(args).Build().Run();
+            //CreateWebHostBuilder(args).Build().Run();
             Listener.RunNew();
             Console.WriteLine("Drop the mic");
             Console.ReadKey();
