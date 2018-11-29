@@ -21,7 +21,7 @@ namespace MsdnSpy.Bot
         {
             InitializeBots(
                 new ConfigurationProvider(),
-                BotMessageHandler.HandleMessage);
+                new BotMessageHandler().HandleMessage);
             StartBots();
             HandleConsoleInput(new CommandHandler());
         }

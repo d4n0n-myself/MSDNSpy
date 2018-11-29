@@ -15,7 +15,6 @@
 
     <ItemGroup>
       <ProjectReference Include="..\MsdnSpy.Database\MsdnSpy.Database.csproj" />
-      <ProjectReference Include="..\MsdnSpy.Logic\MsdnSpy.Logic.csproj" />
     </ItemGroup>
 
 </Project>
