@@ -3,7 +3,7 @@ using Microsoft.Extensions.Configuration;
 using MsdnSpy.Infrastructure.Models;
 using MsdnSpy.Infrastructure.Settings;
 
-namespace MsdnSpy.Database
+namespace MsdnSpy.Infrastructure
 {
     public class DatabaseContext : DbContext
     {

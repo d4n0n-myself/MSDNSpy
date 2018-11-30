@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Text;
+using MsdnSpy.Domain;
 using Telegram.Bot;
 using Telegram.Bot.Args;
 using Telegram.Bot.Types.ReplyMarkups;
-using MsdnSpy.Logic;
+
 
 namespace MsdnSpy.Bot
 {
@@ -52,6 +53,8 @@ namespace MsdnSpy.Bot
 							Test.GetMsdnUrl(
 								$"https://social.msdn.microsoft.com/Search/ru-RU?query={args.Message.Text}&pgArea=header&emptyWatermark=true&ac=4");
 						var parsedXml = InfoParser.XmlParser(queryToXml);
+//						var wc = WebRequest.Create($"http://localhost:1234/");
+//						var response = wc.GetResponse();
 						bot.SendTextMessageAsync(chatId,
 							$"{args.Message.Text}\r\n\r\n\r\n{parsedXml["Docs.summary"]}\r\n\r\n\r\n{msdnLink}",
 							replyMarkup: replyKeyboardMarkup);

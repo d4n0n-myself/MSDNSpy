@@ -2,7 +2,7 @@ using System;
 using System.Net;
 using System.Text;
 
-namespace MsdnSpy.Server
+namespace MsdnSpy.Application
 {
     public class Listener
     {

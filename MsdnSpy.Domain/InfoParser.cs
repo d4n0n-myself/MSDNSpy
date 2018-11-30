@@ -6,7 +6,7 @@ using System.Xml;
 using System.Xml.Linq;
 using Newtonsoft.Json;
 
-namespace MsdnSpy.Logic
+namespace MsdnSpy.Domain
 {
     public class InfoParser
     {

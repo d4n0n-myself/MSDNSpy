@@ -5,7 +5,6 @@ using MsdnSpy.Infrastructure.Settings;
 using System;
 using System.Collections.Generic;
 using System.Net;
-using System.Threading;
 using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Args;
