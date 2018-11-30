@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using MsdnSpy.Infrastructure.Models;
+using MsdnSpy.Core;
 using MsdnSpy.Infrastructure.Settings;
 
 namespace MsdnSpy.Infrastructure
