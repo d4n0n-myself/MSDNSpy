@@ -1,6 +1,8 @@
-﻿namespace MsdnSpy.Infrastructure.Models
+﻿using MsdnSpy.Infrastructure.Interfaces;
+
+namespace MsdnSpy.Infrastructure.Models
 {
-    public class User
+    public class User : IUser
     {
         public int Id { get; set; }
         public string Name { get; set; }

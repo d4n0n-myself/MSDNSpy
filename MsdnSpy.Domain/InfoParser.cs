@@ -21,7 +21,7 @@ namespace MsdnSpy.Domain
             var jsonResponse =
                 client.DownloadString(fullQuery);
             var gApiResult = JsonConvert.DeserializeObject<GithubApiResult>(jsonResponse);
-            foreach (var item in gApiResult.items)
+            foreach (var item in gApiResult.Items)
             {
                 var name = (string) item["name"];
                 if (name.EndsWith(".xml"))

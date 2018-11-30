@@ -9,7 +9,7 @@ namespace MsdnSpy.Infrastructure
     {
         public DbSet<User> Users { get; set; }
 
-        public DatabaseContext(Infrastructure.IConfigurationProvider configurationProvider)
+        public DatabaseContext(IConfigurationProvider configurationProvider)
         {
             _connectionString = configurationProvider.Config
                 .GetSection("DatabaseSection").Get<DatabaseSettings>()

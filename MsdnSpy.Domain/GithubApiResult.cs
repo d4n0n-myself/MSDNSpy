@@ -6,10 +6,10 @@ namespace MsdnSpy.Domain
     public class GithubApiResult
     {
         [JsonProperty("total_count")]
-        public int total_count;
+        public int TotalCount;
         [JsonProperty("incomplete_results")]
-        public bool incomplete_results;
+        public bool IncompleteResults;
         [JsonProperty("items")]
-        public List<Dictionary<string,object>> items;
+        public List<Dictionary<string,object>> Items;
     }
 }
