@@ -7,7 +7,8 @@ namespace MsdnSpy.Infrastructure
 {
     public class DatabaseContext : DbContext
     {
-        public DbSet<User> Users { get; set; }
+        public DbSet<User> Users { get; private set; }
+        public DbSet<UserPreferences> UserPreferences { get; private set; }
 
         public DatabaseContext(IConfigurationProvider configurationProvider)
         {
