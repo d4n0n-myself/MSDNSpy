@@ -1,5 +1,7 @@
-using System.IO;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using MsdnSpy.Infrastructure.Models;
+using MsdnSpy.Infrastructure.Settings;
 
 namespace MsdnSpy.Database
 {
@@ -7,10 +9,18 @@ namespace MsdnSpy.Database
     {
         public DbSet<User> Users { get; set; }
 
+        public DatabaseContext(Infrastructure.IConfigurationProvider configurationProvider)
+        {
+            _connectionString = configurationProvider.Config
+                .GetSection("DatabaseSection").Get<DatabaseSettings>()
+                .ConnectionString;
+        }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            var connectionString = File.ReadAllLines("connectionString.txt")[0];
-            optionsBuilder.UseNpgsql(connectionString);
+            optionsBuilder.UseNpgsql(_connectionString);
         }
+
+        private readonly string _connectionString;
     }
 }

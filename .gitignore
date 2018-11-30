@@ -3,7 +3,7 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
-*botconfig.json
+MsdnSpy*/appconfig.json
 
 # User-specific files
 *.suo
@@ -330,4 +330,3 @@ ASALocalRun/
 
 # MFractors (Xamarin productivity tool) working folder 
 .mfractor/
-MsdnSpy.Bot/connectionString.txt

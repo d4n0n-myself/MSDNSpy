@@ -1,4 +1,4 @@
-﻿namespace MsdnSpy.Database
+﻿namespace MsdnSpy.Infrastructure.Models
 {
     public class User
     {

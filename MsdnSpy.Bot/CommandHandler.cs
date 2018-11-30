@@ -1,12 +1,12 @@
 ﻿namespace MsdnSpy.Bot
 {
-	public static class CommandHandler
-	{
-		public static bool Handle(string command)
-		{
-			if (command == "stop")
-				return false;
-			return true;
-		}
-	}
+    public class CommandHandler
+    {
+        public bool Handle(string command)
+        {
+            if (command == "stop")
+                return false;
+            return true;
+        }
+    }
 }
