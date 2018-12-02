@@ -14,12 +14,14 @@ namespace MsdnSpy.Bot
 {
     internal static class Program
     {
+        public static ConfigurationProvider Provider { get; } = new ConfigurationProvider(); 
+        
         private static readonly List<ITelegramBotClient> Bots = new List<ITelegramBotClient>();
-
+        
         private static void Main(string[] args)
         {
             InitializeBots(
-                new ConfigurationProvider(),
+                Provider,
                 new BotMessageHandler().HandleMessage);
             StartBots();
             HandleConsoleInput(new CommandHandler());

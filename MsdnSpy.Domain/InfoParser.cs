@@ -59,7 +59,9 @@ namespace MsdnSpy.Domain
                     dic.Add(name, innerEl.Value);
                 }
 
-                var xw = el.Attributes().Select(x => $"{x.Name} {x.Value}").Aggregate((x, y) => x + " " + y);
+                var xw = "";
+                if(el.HasAttributes)
+                    xw = el.Attributes().Select(x => $"{x.Name} {x.Value}").Aggregate((x, y) => x + " " + y);
                 dic.Add(el.Name.LocalName, xw);
             }
         }
