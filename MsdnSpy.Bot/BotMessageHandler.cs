@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Text;
-using System.Threading;
 using MsdnSpy.Core;
-using MsdnSpy.Domain;
 using MsdnSpy.Infrastructure;
 using Telegram.Bot;
 using Telegram.Bot.Args;
@@ -19,14 +16,14 @@ namespace MsdnSpy.Bot
 	{
 		private static DatabaseContext _context = new DatabaseContext(Program.Provider);
 		private static IUserPreferencesRepository _userPreferencesRepository = new UserPreferencesRepository(_context);
-		
+
 		public void HandleMessage(object sender, MessageEventArgs args)
 		{
 			ITelegramBotClient bot;
 			long chatId;
 			try
 			{
-				bot = (ITelegramBotClient)sender;
+				bot = (ITelegramBotClient) sender;
 				chatId = args.Message.Chat.Id;
 			}
 			catch (Exception e)
@@ -34,44 +31,20 @@ namespace MsdnSpy.Bot
 				Console.WriteLine(e.Message);
 				return;
 			}
-			
+
 			Console.WriteLine($"{DateTime.UtcNow} UTC: Hello from {args.Message.Chat.Username}");
 
-			//var preferences = _userPreferencesRepository.GetPreferencesByChatId(chatId);
-			
 			try
 			{
-
-//				switch (args.Message.Text)
-//				{
-//					case null:
-//						return;
-//					case "Assembly":
-//					case "Methods":
-//						bot.SendTextMessageAsync(chatId, "To be added.");
-//						break;
-//					default:
-//					{
-				var inlineKeyboardButtons = UserPreferences.DefaultPreferences.Select(x => x.Value ? new InlineKeyboardButton {Text = x.Key, Url = "https://google.com/"} : null).Select(
-					x=> new List<InlineKeyboardButton> {x}).ToList();
+				var inlineKeyboardButtons = UserPreferences.DefaultPreferences.Select(x =>
+					x.Value ? new InlineKeyboardButton {Text = x.Key, Url = "https://google.com/"} : null).Select(
+					x => new List<InlineKeyboardButton> {x}).ToList();
 				var replyKeyboardMarkup =
-							new InlineKeyboardMarkup(inlineKeyboardButtons);
-				
-						var queryToXml =
-							"https://raw.githubusercontent.com/dotnet/dotnet-api-docs/master/" +
-							InfoParser.FindXmlFilePath(args.Message.Text);
-						var msdnLink =
-							Test.GetMsdnUrl(
-								$"https://social.msdn.microsoft.com/Search/ru-RU?query={args.Message.Text}&pgArea=header&emptyWatermark=true&ac=4");
-						var parsedXml = InfoParser.XmlParser(queryToXml);
-//						var wc = WebRequest.Create($"http://localhost:1234/");
-//						var response = wc.GetResponse();
-						bot.SendTextMessageAsync(chatId,
-							$"{args.Message.Text}\r\n\r\n\r\n{parsedXml["Docs.summary"]}\r\n\r\n\r\n{msdnLink}",
-							replyMarkup: replyKeyboardMarkup);
-//						break;
-//					}
-//				}
+					new InlineKeyboardMarkup(inlineKeyboardButtons);
+
+				var responseString = SendRequest(args);
+				var answer = $"{args.Message.Text}\r\n\r\n{responseString[0]}\r\n\r\n{responseString[1]}";
+				bot.SendTextMessageAsync(chatId, answer, replyMarkup: replyKeyboardMarkup);
 			}
 			catch (Exception e)
 			{
@@ -82,16 +55,16 @@ namespace MsdnSpy.Bot
 			Console.WriteLine($"{DateTime.UtcNow}: Handled.");
 		}
 
-		private static string SendRequest(MessageEventArgs args)
+		private static string[] SendRequest(MessageEventArgs args)
 		{
-			
 			var request = WebRequest.Create($"http://localhost:1234/?query={args.Message.Text}");
-			var response = request.GetResponse();
-			
-			var buffer = new byte[100];
-			response.GetResponseStream().Read(buffer, 0, 100);
-			return buffer.Length != 0 ? Encoding.ASCII.GetString(buffer) : string.Empty;
+			var reader = request.GetResponse().GetResponseStream() ??
+			             throw new ArgumentNullException(nameof(request.GetResponse));
+			var buffer = new byte[1024];
+			reader.Read(buffer, 0, 1024);
+			if (buffer.Length == 0) return new[] {string.Empty};
+			var result = Encoding.ASCII.GetString(buffer.Where(x => x != 0).ToArray()).Split("https");
+			return new[] {result[0], "https" + result[1]};
 		}
-		
 	}
 }
