@@ -11,9 +11,9 @@ using Telegram.Bot.Types.ReplyMarkups;
 
 namespace MsdnSpy.Bot
 {
-	public class BotMessageHandler
+	public static class BotMessageHandler
 	{
-		public void HandleMessage(object sender, MessageEventArgs args)
+		public static void HandleMessage(object sender, MessageEventArgs args)
 		{
 			ITelegramBotClient bot;
 			long chatId;
@@ -81,8 +81,6 @@ namespace MsdnSpy.Bot
 			using (var reader = new StreamReader(responseStream))
 			{
 				var content = reader.ReadToEnd();
-				if (string.IsNullOrWhiteSpace(content))
-					return new Dictionary<string, string>();
 				return JsonConvert.DeserializeObject<IDictionary<string, string>>(content);
 			}
 		}

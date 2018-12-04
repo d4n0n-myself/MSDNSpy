@@ -5,8 +5,12 @@ namespace MsdnSpy.Infrastructure
 	public class ConfigurationProvider : IConfigurationProvider
 	{
 		public IConfiguration Config { get; }
-			= new ConfigurationBuilder()
-				.AddJsonFile("appconfig.json")
+
+		public ConfigurationProvider(string settingsFileName)
+		{
+			Config = new ConfigurationBuilder()
+				.AddJsonFile(settingsFileName)
 				.Build();
+		}
 	}
 }

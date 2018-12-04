@@ -1,0 +1,14 @@
+﻿{
+	"BotSection": {
+		"Port": 80,
+		"Token": "BOT_TOKEN",
+		"Proxies": [
+			{
+				"Ip": "127.0.0.1",
+				"Port": 25565,
+				"UserName": "Ivan",
+				"Password": "qwerty"
+			}
+		]
+	}
+}

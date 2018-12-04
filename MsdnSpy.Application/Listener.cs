@@ -15,9 +15,9 @@ namespace MsdnSpy.Application
 			_url = url;
 		}
 
-		public static Listener RunNew()
+		public static Listener RunNew(string url)
 		{
-			var listener = new Listener($"http://localhost:1234/");
+			var listener = new Listener(url);
 			listener.Run();
 			return listener;
 		}

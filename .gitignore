@@ -3,7 +3,9 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
+# Configs should not be published
 MsdnSpy*/appconfig.json
+MsdnSpy*/botconfig.json
 
 # User-specific files
 *.suo

@@ -18,10 +18,4 @@
     <ProjectReference Include="..\MsdnSpy.Core\MsdnSpy.Core.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Update="appconfig.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-
 </Project>

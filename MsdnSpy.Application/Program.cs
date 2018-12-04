@@ -6,7 +6,7 @@ namespace MsdnSpy.Application
 	{
 		public static void Main(string[] args)
 		{
-			Listener.RunNew();
+			Listener.RunNew("http://localhost:1234/");
 			Console.WriteLine("Drop the mic");
 			Console.ReadKey();
 		}
