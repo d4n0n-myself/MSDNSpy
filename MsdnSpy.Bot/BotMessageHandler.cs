@@ -75,8 +75,8 @@ namespace MsdnSpy.Bot
 		private static IDictionary<string, string> SendRequest(string query)
 		{
 			var request = WebRequest.Create($"http://localhost:1234/?query={query}");
-			var responseStream = request.GetResponse().GetResponseStream() ??
-				throw new WebException("Server is unavailable");
+			var response = request.GetResponse();
+			var responseStream = response.GetResponseStream();
 
 			using (var reader = new StreamReader(responseStream))
 			{

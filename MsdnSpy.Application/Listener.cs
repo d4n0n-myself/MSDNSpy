@@ -36,7 +36,12 @@ namespace MsdnSpy.Application
 				while (true)
 				{
 					var context = _httpListener.GetContext();
-					HandleRequest(context);
+					
+					var result = HandleRequest(context);
+
+					var jsonResult = JsonConvert.SerializeObject(result);
+					using (var output = new StreamWriter(context.Response.OutputStream))
+						output.Write(jsonResult);
 				}
 			}
 			finally
@@ -50,7 +55,7 @@ namespace MsdnSpy.Application
 		private readonly HttpListener _httpListener;
 		private readonly string _url;
 
-		private void HandleRequest(HttpListenerContext context)
+		private object HandleRequest(HttpListenerContext context)
 		{
 			try
 			{
@@ -60,13 +65,16 @@ namespace MsdnSpy.Application
 
 				var result = infoGetter.GetInfoByQuery(query);
 
-				using (var output = new StreamWriter(context.Response.OutputStream))
-					output.WriteLine(JsonConvert.SerializeObject(result));
 				Console.WriteLine($"{DateTime.UtcNow}: Handled query {query}");
+				return result;
 			}
 			catch (Exception e)
 			{
-				Console.WriteLine($"{DateTime.UtcNow}: {e}");
+				context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+				var errorMessage = e.ToString();
+
+				Console.WriteLine($"{DateTime.UtcNow}: {errorMessage}");
+				return errorMessage;
 			}
 		}
 	}
