@@ -1,16 +1,14 @@
-﻿using System;
+﻿using MsdnSpy.Domain;
+using System;
 using System.Collections.Generic;
 using System.Net;
-using System.Text;
-using MsdnSpy.Domain;
 using Telegram.Bot;
 using Telegram.Bot.Args;
 using Telegram.Bot.Types.ReplyMarkups;
 
-
 namespace MsdnSpy.Bot
 {
-	public class BotMessageHandler
+    public class BotMessageHandler
 	{
 		public void HandleMessage(object sender, MessageEventArgs args)
 		{
@@ -27,11 +25,9 @@ namespace MsdnSpy.Bot
 				return;
 			}
 			
-			//var requestAnswer = SendRequest(args);
-			
 			try
 			{
-				Console.WriteLine($"{DateTime.UtcNow} UTC: Hello from {args.Message.Chat.Username}");
+				Console.WriteLine($"{DateTime.UtcNow}: Hello from {args.Message.Chat.Username}");
 
 				switch (args.Message.Text)
 				{
@@ -42,24 +38,25 @@ namespace MsdnSpy.Bot
 						bot.SendTextMessageAsync(chatId, "To be added.");
 						break;
 					default:
-					{
-						var replyKeyboardMarkup =
-							new ReplyKeyboardMarkup(
-								new List<KeyboardButton> {new KeyboardButton("Assembly"), new KeyboardButton("Methods")},
-								true, true);
-						var queryToXml =
-							"https://raw.githubusercontent.com/dotnet/dotnet-api-docs/master/" + InfoParser.FindXmlFilePath(args.Message.Text);
-						var msdnLink =
-							Test.GetMsdnUrl(
-								$"https://social.msdn.microsoft.com/Search/ru-RU?query={args.Message.Text}&pgArea=header&emptyWatermark=true&ac=4");
-						var parsedXml = InfoParser.XmlParser(queryToXml);
-//						var wc = WebRequest.Create($"http://localhost:1234/");
-//						var response = wc.GetResponse();
-						bot.SendTextMessageAsync(chatId,
-							$"{args.Message.Text}\r\n\r\n\r\n{parsedXml["Docs.summary"]}\r\n\r\n\r\n{msdnLink}",
-							replyMarkup: replyKeyboardMarkup);
-						break;
-					}
+                        {
+                            var replyKeyboardMarkup = new ReplyKeyboardMarkup(
+                                new List<KeyboardButton> { new KeyboardButton("Assembly"), new KeyboardButton("Methods") },
+                                resizeKeyboard: true,
+                                oneTimeKeyboard: true
+                            );
+
+                            //var wc = WebRequest.Create($"http://localhost:1234/");
+                            //var response = wc.GetResponse();
+
+                            var infoGetter = new FromMsdnGetter(new WebClient());
+                            var result = infoGetter.GetInfoByQuery(args.Message.Text);
+                            bot.SendTextMessageAsync(
+                                chatId,
+                                result,
+                                replyMarkup: replyKeyboardMarkup
+                            );
+                            break;
+                        }
 				}
 			}
 			catch (Exception e)
@@ -69,18 +66,6 @@ namespace MsdnSpy.Bot
 			}
 
 			Console.WriteLine($"{DateTime.UtcNow}: Handled.");
-		}
-
-		private static string SendRequest(MessageEventArgs args)
-		{
-			
-			var request = WebRequest.Create($"http://localhost:1234/?query={args.Message.Text}");
-			var response = request.GetResponse();
-			
-			var buffer = new byte[100];
-			response.GetResponseStream().Read(buffer, 0, 100);
-			return buffer.Length != 0 ? Encoding.ASCII.GetString(buffer) : string.Empty;
-		}
-		
+		}		
 	}
 }

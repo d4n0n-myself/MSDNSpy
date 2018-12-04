@@ -10,6 +10,6 @@ namespace MsdnSpy.Domain
         [JsonProperty("incomplete_results")]
         public bool IncompleteResults;
         [JsonProperty("items")]
-        public List<Dictionary<string,object>> Items;
+        public List<Dictionary<string, object>> Items;
     }
 }

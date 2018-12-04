@@ -12,7 +12,7 @@ using ConfigurationProvider = MsdnSpy.Infrastructure.ConfigurationProvider;
 
 namespace MsdnSpy.Bot
 {
-    internal static class Program
+    public static class Program
     {
         private static readonly List<ITelegramBotClient> Bots = new List<ITelegramBotClient>();
 
@@ -47,12 +47,12 @@ namespace MsdnSpy.Bot
                 );
                 Bots.Add(new TelegramBotClient
                 (
-                        settings.Token,
-                        new SocksWebProxy
-                        (
-                            proxyConfig,
-                            allowBypass: false
-                        )
+                    settings.Token,
+                    new SocksWebProxy
+                    (
+                        proxyConfig,
+                        allowBypass: false
+                    )
                 ));
             }
 
