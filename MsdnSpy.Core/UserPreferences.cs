@@ -5,7 +5,7 @@ namespace MsdnSpy.Core
 {
     public class UserPreferences : ValueType<UserPreferences>
     {
-        public IDictionary<string, bool> Preferences { get; } = new Dictionary<string, bool>()
+        public static IDictionary<string, bool> DefaultPreferences { get; } = new Dictionary<string, bool>()
         {
             ["Properties"] = true,
             ["Methods"] = true,

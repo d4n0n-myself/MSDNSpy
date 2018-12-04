@@ -1,6 +1,10 @@
-﻿using MsdnSpy.Domain;
+﻿using MsdnSpy.Core;
+using MsdnSpy.Infrastructure;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Net;
 using Telegram.Bot;
 using Telegram.Bot.Args;
@@ -8,12 +12,18 @@ using Telegram.Bot.Types.ReplyMarkups;
 
 namespace MsdnSpy.Bot
 {
-    public class BotMessageHandler
+	public class BotMessageHandler
 	{
+		private static readonly DatabaseContext _context
+			= new DatabaseContext(Program.Provider);
+		private static readonly IUserPreferencesRepository _userPreferencesRepository
+			= new UserPreferencesRepository(_context);
+
 		public void HandleMessage(object sender, MessageEventArgs args)
 		{
 			ITelegramBotClient bot;
 			long chatId;
+
 			try
 			{
 				bot = (ITelegramBotClient)sender;
@@ -24,10 +34,14 @@ namespace MsdnSpy.Bot
 				Console.WriteLine(e.Message);
 				return;
 			}
-			
+
 			try
 			{
-				Console.WriteLine($"{DateTime.UtcNow}: Hello from {args.Message.Chat.Username}");
+				var query = args.Message.Text;
+				var queryBeginning = query.Substring(0, Math.Min(query.Length, 50));
+
+				Console.WriteLine($"{DateTime.UtcNow}: Received query from {args.Message.Chat.Username}:\r\n" +
+					queryBeginning);
 
 				switch (args.Message.Text)
 				{
@@ -38,34 +52,45 @@ namespace MsdnSpy.Bot
 						bot.SendTextMessageAsync(chatId, "To be added.");
 						break;
 					default:
-                        {
-                            var replyKeyboardMarkup = new ReplyKeyboardMarkup(
-                                new List<KeyboardButton> { new KeyboardButton("Assembly"), new KeyboardButton("Methods") },
-                                resizeKeyboard: true,
-                                oneTimeKeyboard: true
-                            );
+						{
+                            var inlineKeyboardButtons = UserPreferences.DefaultPreferences
+                                .Where(x => x.Value)
+                                .Select(x => new InlineKeyboardButton { Text = x.Key, Url = "https://google.com/" })
+                                .Select(x => new List<InlineKeyboardButton> { x })
+                                .ToList();
+                            var replyKeyboardMarkup = new InlineKeyboardMarkup(inlineKeyboardButtons) { };
 
-                            //var wc = WebRequest.Create($"http://localhost:1234/");
-                            //var response = wc.GetResponse();
+							var result = SendRequest(query);
+							var answer = $"{query}\r\n\r\n{result["Docs.summary"]}\r\n\r\n{result["msdnLink"]}";
 
-                            var infoGetter = new FromMsdnGetter(new WebClient());
-                            var result = infoGetter.GetInfoByQuery(args.Message.Text);
-                            bot.SendTextMessageAsync(
-                                chatId,
-                                result,
-                                replyMarkup: replyKeyboardMarkup
-                            );
-                            break;
-                        }
+							bot.SendTextMessageAsync(chatId, answer, replyMarkup: replyKeyboardMarkup);
+							break;
+						}
 				}
+
+				Console.WriteLine($"{DateTime.UtcNow}: Handled query from {args.Message.Chat.Username}:\r\n" +
+					queryBeginning);
 			}
 			catch (Exception e)
 			{
-				Console.WriteLine(e.Message);
-				bot.SendTextMessageAsync(chatId, $"This thing just said : {e.Message}");
+				Console.WriteLine($"{DateTime.UtcNow}: {e}");
+                bot.SendTextMessageAsync(chatId, $"This thing just said: {e.Message}");
 			}
+		}
 
-			Console.WriteLine($"{DateTime.UtcNow}: Handled.");
-		}		
+		private static IDictionary<string, string> SendRequest(string query)
+		{
+			var request = WebRequest.Create($"http://localhost:1234/?query={query}");
+			var responseStream = request.GetResponse().GetResponseStream() ??
+				throw new WebException("Server is unavailable");
+
+			using (var reader = new StreamReader(responseStream))
+			{
+				var content = reader.ReadToEnd();
+				if (string.IsNullOrWhiteSpace(content))
+					return new Dictionary<string, string>();
+				return JsonConvert.DeserializeObject<IDictionary<string, string>>(content);
+			}
+		}
 	}
 }

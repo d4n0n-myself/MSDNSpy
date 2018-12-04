@@ -4,9 +4,7 @@
     {
         public bool Handle(string command)
         {
-            if (command == "stop")
-                return false;
-            return true;
+            return command != "stop";
         }
     }
 }

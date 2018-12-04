@@ -1,7 +1,9 @@
-﻿namespace MsdnSpy.Domain
+﻿using System.Collections.Generic;
+
+namespace MsdnSpy.Domain
 {
-    public interface IInfoGetter
-    {
-        string GetInfoByQuery(string query);
-    }
+	public interface IInfoGetter
+	{
+		IDictionary<string, string> GetInfoByQuery(string query);
+	}
 }

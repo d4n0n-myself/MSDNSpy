@@ -6,6 +6,10 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
+    </ItemGroup>
+
+    <ItemGroup>
       <ProjectReference Include="..\MsdnSpy.Domain\MsdnSpy.Domain.csproj" />
       <ProjectReference Include="..\MsdnSpy.Infrastructure\MsdnSpy.Infrastructure.csproj" />
     </ItemGroup>

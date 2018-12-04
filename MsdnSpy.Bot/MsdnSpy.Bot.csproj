@@ -6,7 +6,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\MsdnSpy.Domain\MsdnSpy.Domain.csproj" />
       <ProjectReference Include="..\MsdnSpy.Infrastructure\MsdnSpy.Infrastructure.csproj" />
     </ItemGroup>
 
