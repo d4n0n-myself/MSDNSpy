@@ -2,8 +2,8 @@
 
 namespace MsdnSpy.Infrastructure
 {
-    public interface IConfigurationProvider
-    {
-        IConfiguration Config { get; }
-    }
+	public interface IConfigurationProvider
+	{
+		IConfiguration Config { get; }
+	}
 }

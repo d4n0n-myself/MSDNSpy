@@ -52,22 +52,22 @@ namespace MsdnSpy.Application
 
 		private void HandleRequest(HttpListenerContext context)
 		{
-            try
-            {
-                var query = context.Request.QueryString["query"];
-                var infoGetter = new FromMsdnGetter(new WebClient());
-                Console.WriteLine($"{DateTime.UtcNow}: Received query {query}");
+			try
+			{
+				var query = context.Request.QueryString["query"];
+				var infoGetter = new FromMsdnGetter(new WebClient());
+				Console.WriteLine($"{DateTime.UtcNow}: Received query {query}");
 
-                var result = infoGetter.GetInfoByQuery(query);
+				var result = infoGetter.GetInfoByQuery(query);
 
-                using (var output = new StreamWriter(context.Response.OutputStream))
-                    output.WriteLine(JsonConvert.SerializeObject(result));
-                Console.WriteLine($"{DateTime.UtcNow}: Handled query {query}");
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine($"{DateTime.UtcNow}: {e}");
-            }
+				using (var output = new StreamWriter(context.Response.OutputStream))
+					output.WriteLine(JsonConvert.SerializeObject(result));
+				Console.WriteLine($"{DateTime.UtcNow}: Handled query {query}");
+			}
+			catch (Exception e)
+			{
+				Console.WriteLine($"{DateTime.UtcNow}: {e}");
+			}
 		}
 	}
 }

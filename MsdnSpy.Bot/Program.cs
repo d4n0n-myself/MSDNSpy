@@ -12,71 +12,71 @@ using ConfigurationProvider = MsdnSpy.Infrastructure.ConfigurationProvider;
 
 namespace MsdnSpy.Bot
 {
-    public static class Program
-    {
-        private static readonly List<ITelegramBotClient> Bots = new List<ITelegramBotClient>();
+	public static class Program
+	{
+		private static readonly List<ITelegramBotClient> Bots = new List<ITelegramBotClient>();
 
-        private static void Main(string[] args)
-        {
-            InitializeBots(
-                new ConfigurationProvider(),
-                new BotMessageHandler().HandleMessage);
-            StartBots();
-            HandleConsoleInput(new CommandHandler());
-        }
+		private static void Main(string[] args)
+		{
+			InitializeBots(
+				new ConfigurationProvider(),
+				new BotMessageHandler().HandleMessage);
+			StartBots();
+			HandleConsoleInput(new CommandHandler());
+		}
 
-        private static void InitializeBots(
-            ConfigurationProvider configurationProvider,
-            EventHandler<MessageEventArgs> messageHandler)
-        {
-            var settings = configurationProvider.Config
-                .GetSection("BotSection").Get<BotSettings>();
+		private static void InitializeBots(
+			ConfigurationProvider configurationProvider,
+			EventHandler<MessageEventArgs> messageHandler)
+		{
+			var settings = configurationProvider.Config
+				.GetSection("BotSection").Get<BotSettings>();
 
-            Bots.Add(new TelegramBotClient(settings.Token));
-            foreach (var proxySettings in settings.Proxies)
-            {
-                var proxyConfig = new ProxyConfig
-                (
-                    IPAddress.Loopback,
-                    settings.Port,
-                    IPAddress.Parse(proxySettings.Ip),
-                    proxySettings.Port,
-                    ProxyConfig.SocksVersion.Five,
-                    proxySettings.UserName,
-                    proxySettings.Password
-                );
-                Bots.Add(new TelegramBotClient
-                (
-                    settings.Token,
-                    new SocksWebProxy
-                    (
-                        proxyConfig,
-                        allowBypass: false
-                    )
-                ));
-            }
+			Bots.Add(new TelegramBotClient(settings.Token));
+			foreach (var proxySettings in settings.Proxies)
+			{
+				var proxyConfig = new ProxyConfig
+				(
+					IPAddress.Loopback,
+					settings.Port,
+					IPAddress.Parse(proxySettings.Ip),
+					proxySettings.Port,
+					ProxyConfig.SocksVersion.Five,
+					proxySettings.UserName,
+					proxySettings.Password
+				);
+				Bots.Add(new TelegramBotClient
+				(
+					settings.Token,
+					new SocksWebProxy
+					(
+						proxyConfig,
+						allowBypass: false
+					)
+				));
+			}
 
-            foreach (var bot in Bots)
-                bot.OnMessage += messageHandler;
-        }
+			foreach (var bot in Bots)
+				bot.OnMessage += messageHandler;
+		}
 
-        private static void StartBots()
-        {
-            foreach (var bot in Bots)
-            {
-                Console.WriteLine($"Started bot with id {bot.BotId}");
-                Task.Run(() => bot.StartReceiving());
-            }
-        }
+		private static void StartBots()
+		{
+			foreach (var bot in Bots)
+			{
+				Console.WriteLine($"Started bot with id {bot.BotId}");
+				Task.Run(() => bot.StartReceiving());
+			}
+		}
 
-        private static void HandleConsoleInput(CommandHandler commandHandler)
-        {
-            while (true)
-            {
-                var input = Console.ReadLine();
-                if (!commandHandler.Handle(input))
-                    return;
-            }
-        }
-    }
+		private static void HandleConsoleInput(CommandHandler commandHandler)
+		{
+			while (true)
+			{
+				var input = Console.ReadLine();
+				if (!commandHandler.Handle(input))
+					return;
+			}
+		}
+	}
 }

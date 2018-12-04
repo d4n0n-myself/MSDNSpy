@@ -1,5 +1,4 @@
 ﻿using MsdnSpy.Core;
-using MsdnSpy.Infrastructure;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -14,11 +13,6 @@ namespace MsdnSpy.Bot
 {
 	public class BotMessageHandler
 	{
-		private static readonly DatabaseContext _context
-			= new DatabaseContext(Program.Provider);
-		private static readonly IUserPreferencesRepository _userPreferencesRepository
-			= new UserPreferencesRepository(_context);
-
 		public void HandleMessage(object sender, MessageEventArgs args)
 		{
 			ITelegramBotClient bot;
@@ -53,12 +47,12 @@ namespace MsdnSpy.Bot
 						break;
 					default:
 						{
-                            var inlineKeyboardButtons = UserPreferences.DefaultPreferences
-                                .Where(x => x.Value)
-                                .Select(x => new InlineKeyboardButton { Text = x.Key, Url = "https://google.com/" })
-                                .Select(x => new List<InlineKeyboardButton> { x })
-                                .ToList();
-                            var replyKeyboardMarkup = new InlineKeyboardMarkup(inlineKeyboardButtons) { };
+							var inlineKeyboardButtons = UserPreferences.DefaultPreferences
+								.Where(x => x.Value)
+								.Select(x => new InlineKeyboardButton { Text = x.Key, Url = "https://google.com/" })
+								.Select(x => new List<InlineKeyboardButton> { x })
+								.ToList();
+							var replyKeyboardMarkup = new InlineKeyboardMarkup(inlineKeyboardButtons) { };
 
 							var result = SendRequest(query);
 							var answer = $"{query}\r\n\r\n{result["Docs.summary"]}\r\n\r\n{result["msdnLink"]}";
@@ -74,7 +68,7 @@ namespace MsdnSpy.Bot
 			catch (Exception e)
 			{
 				Console.WriteLine($"{DateTime.UtcNow}: {e}");
-                bot.SendTextMessageAsync(chatId, $"This thing just said: {e.Message}");
+				bot.SendTextMessageAsync(chatId, $"This thing just said: {e.Message}");
 			}
 		}
 

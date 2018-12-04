@@ -28,10 +28,10 @@ namespace MsdnSpy.Domain
 			var msdnLink = GetMsdnUrl(
 				$"https://social.msdn.microsoft.com/Search/ru-RU?query={query}&pgArea=header&emptyWatermark=true&ac=4");
 
-            var result = DownloadAndParseXml(urlToXml);
-            result["msdnLink"] = msdnLink;
+			var result = DownloadAndParseXml(urlToXml);
+			result["msdnLink"] = msdnLink;
 
-            return result;
+			return result;
 		}
 
 		private string FindPathToXmlFile(string query)
