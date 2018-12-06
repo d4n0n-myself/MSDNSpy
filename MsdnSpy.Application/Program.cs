@@ -1,4 +1,5 @@
 ﻿using System;
+using MsdnSpy.Infrastructure;
 
 namespace MsdnSpy.Application
 {
@@ -6,9 +7,9 @@ namespace MsdnSpy.Application
 	{
 		public static void Main(string[] args)
 		{
-			Listener.RunNew("http://localhost:1234/");
-			Console.WriteLine("Drop the mic");
-			Console.ReadKey();
+            Listener.RunNew("http://127.0.0.1:1234/");
+            Console.WriteLine("Drop the mic");
+            Console.ReadKey();
 		}
 	}
 }
