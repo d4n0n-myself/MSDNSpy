@@ -55,7 +55,9 @@ namespace MsdnSpy.Bot
 							var replyKeyboardMarkup = new InlineKeyboardMarkup(inlineKeyboardButtons) { };
 
 							var result = SendRequest(query);
-							var answer = $"{query}\r\n\r\n{result["Docs.summary"]}\r\n\r\n{result["msdnLink"]}";
+							var answer = $"{result["Name"].First()}\r\n\r\n" +
+								$"{result["Description"].First()}\r\n\r\n" +
+								$"{result["MsdnUrl"].First()}";
 
 							bot.SendTextMessageAsync(chatId, answer, replyMarkup: replyKeyboardMarkup);
 							break;
@@ -72,16 +74,16 @@ namespace MsdnSpy.Bot
 			}
 		}
 
-		private static IDictionary<string, string> SendRequest(string query)
+		private static IDictionary<string, HashSet<string>> SendRequest(string query)
 		{
-			var request = WebRequest.Create($"http://localhost:1234/?query={query}");
+			var request = WebRequest.Create($"http://127.0.0.1:1234/?query={query}");
 			var response = request.GetResponse();
 			var responseStream = response.GetResponseStream();
 
 			using (var reader = new StreamReader(responseStream))
 			{
 				var content = reader.ReadToEnd();
-				return JsonConvert.DeserializeObject<IDictionary<string, string>>(content);
+				return JsonConvert.DeserializeObject<IDictionary<string, HashSet<string>>>(content);
 			}
 		}
 	}

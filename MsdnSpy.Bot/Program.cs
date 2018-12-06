@@ -7,14 +7,15 @@ using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using Telegram.Bot;
-using ConfigurationProvider = MsdnSpy.Infrastructure.ConfigurationProvider;
 
 namespace MsdnSpy.Bot
 {
 	public static class Program
 	{
-		private static readonly IConfiguration Config
-			= new ConfigurationProvider("botconfig.json").Config;
+		private static readonly BotSettings Settings
+			= new Infrastructure.ConfigurationProvider("botconfig.json").Config
+				.GetSection("BotSection")
+				.Get<BotSettings>();
 
 		private static void Main(string[] args)
 		{
@@ -31,13 +32,12 @@ namespace MsdnSpy.Bot
 
 		private static IEnumerable<ITelegramBotClient> CreateBots()
 		{
-			var settings = Config.GetSection("BotSection").Get<BotSettings>();
+			yield return new TelegramBotClient(Settings.Token);
 
-			yield return new TelegramBotClient(settings.Token);
-			foreach (var proxySettings in settings.Proxies)
+			foreach (var proxySettings in Settings.Proxies)
 			{
-				var proxy = GetProxy(proxySettings, IPAddress.Loopback, settings.Port);
-				yield return new TelegramBotClient(settings.Token, proxy);
+				var proxy = GetProxy(proxySettings, IPAddress.Loopback, Settings.Port);
+				yield return new TelegramBotClient(Settings.Token, proxy);
 			}
 		}
 

@@ -1,4 +1,5 @@
 using MsdnSpy.Domain;
+using MsdnSpy.Domain.Helpers;
 using Newtonsoft.Json;
 using System;
 using System.IO;
@@ -33,16 +34,7 @@ namespace MsdnSpy.Application
 				_httpListener.Start();
 				Console.WriteLine($"Now listening on {_url}");
 
-				while (true)
-				{
-					var context = _httpListener.GetContext();
-					
-					var result = HandleRequest(context);
-
-					var jsonResult = JsonConvert.SerializeObject(result);
-					using (var output = new StreamWriter(context.Response.OutputStream))
-						output.Write(jsonResult);
-				}
+				Listen();
 			}
 			finally
 			{
@@ -55,12 +47,33 @@ namespace MsdnSpy.Application
 		private readonly HttpListener _httpListener;
 		private readonly string _url;
 
+		private void Listen()
+		{
+			try
+			{
+				while (true)
+				{
+					var context = _httpListener.GetContext();
+
+					var result = HandleRequest(context);
+
+					var jsonResult = JsonConvert.SerializeObject(result);
+					using (var output = new StreamWriter(context.Response.OutputStream))
+						output.Write(jsonResult);
+				}
+			}
+			catch (Exception e)
+			{
+				Console.WriteLine($"{DateTime.UtcNow}: {e}");
+			}
+		}
+
 		private object HandleRequest(HttpListenerContext context)
 		{
 			try
 			{
 				var query = context.Request.QueryString["query"];
-				var infoGetter = new FromMsdnGetter(new WebClient());
+				var infoGetter = new FromMsdnGetter(new PageDownloader(new WebClient()));
 				Console.WriteLine($"{DateTime.UtcNow}: Received query {query}");
 
 				var result = infoGetter.GetInfoByQuery(query);
