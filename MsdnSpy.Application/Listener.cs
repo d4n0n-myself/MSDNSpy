@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 using System;
 using System.IO;
 using System.Net;
+using MsdnSpy.Infrastructure;
 
 namespace MsdnSpy.Application
 {
@@ -46,6 +47,8 @@ namespace MsdnSpy.Application
 
 		private readonly HttpListener _httpListener;
 		private readonly string _url;
+		private static readonly DatabaseContext _databaseContext = new DatabaseContext(new ConfigurationProvider("appconfig.json"));
+		private static readonly UserPreferencesRepository _storage = new UserPreferencesRepository(_databaseContext);
 
 		private void Listen()
 		{
@@ -72,14 +75,9 @@ namespace MsdnSpy.Application
 		{
 			try
 			{
-				var query = context.Request.QueryString["query"];
-				var infoGetter = new FromMsdnGetter(new PageDownloader(new WebClient()));
-				Console.WriteLine($"{DateTime.UtcNow}: Received query {query}");
-
-				var result = infoGetter.GetInfoByQuery(query);
-
-				Console.WriteLine($"{DateTime.UtcNow}: Handled query {query}");
-				return result;
+				return context.Request.QueryString["query"] == null
+										  ? HandlePreferencesRequest(context)
+										  : HandleDocumentationRequest(context);
 			}
 			catch (Exception e)
 			{
@@ -89,6 +87,27 @@ namespace MsdnSpy.Application
 				Console.WriteLine($"{DateTime.UtcNow}: {errorMessage}");
 				return errorMessage;
 			}
+		}
+
+		private object HandleDocumentationRequest(HttpListenerContext context)
+		{
+			var query = context.Request.QueryString["query"];
+			Console.WriteLine($"{DateTime.UtcNow}: Received query {query}");
+			var infoGetter = new FromMsdnGetter(new PageDownloader(new WebClient()));
+
+			var result = infoGetter.GetInfoByQuery(query);
+
+			Console.WriteLine($"{DateTime.UtcNow}: Handled query {query}");
+			return result;
+		}
+
+		private object HandlePreferencesRequest(HttpListenerContext context)
+		{
+			var chatId = long.Parse(context.Request.QueryString["chatId"]);
+			var category = context.Request.QueryString["category"];
+			Console.WriteLine($"{DateTime.UtcNow}: Received preferences change : {category}");
+			Console.WriteLine($"{DateTime.UtcNow}: Handled preferences change : {category}");
+			return _storage.AddCategory(chatId, category);
 		}
 	}
 }

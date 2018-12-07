@@ -1,5 +1,4 @@
-﻿using MsdnSpy.Core;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -13,7 +12,7 @@ namespace MsdnSpy.Bot
 {
 	public static class BotMessageHandler
 	{
-		public static void HandleMessage(object sender, MessageEventArgs args)
+		public static async void HandleMessage(object sender, MessageEventArgs args)
 		{
 			ITelegramBotClient bot;
 			long chatId;
@@ -35,55 +34,84 @@ namespace MsdnSpy.Bot
 				var queryBeginning = query.Substring(0, Math.Min(query.Length, 50));
 
 				Console.WriteLine($"{DateTime.UtcNow}: Received query from {args.Message.Chat.Username}:\r\n" +
-					queryBeginning);
+				                  queryBeginning);
 
-				switch (args.Message.Text)
-				{
-					case null:
-						return;
-					case "Assembly":
-					case "Methods":
-						bot.SendTextMessageAsync(chatId, "To be added.");
-						break;
-					default:
-						{
-							var inlineKeyboardButtons = UserPreferences.DefaultPreferences
-								.Where(x => x.Value)
-								.Select(x => new InlineKeyboardButton { Text = x.Key, Url = "https://google.com/" })
-								.Select(x => new List<InlineKeyboardButton> { x })
-								.ToList();
-							var replyKeyboardMarkup = new InlineKeyboardMarkup(inlineKeyboardButtons) { };
+				var command = GetCommand(args.Message.Text);
 
-							var result = SendRequest(query);
-							var answer = $"{result["Name"].First()}\r\n\r\n" +
-								$"{result["Description"].First()}\r\n\r\n" +
-								$"{result["MsdnUrl"].First()}";
+				var result = _requestHandlers[command](args.Message.Text, chatId);
 
-							bot.SendTextMessageAsync(chatId, answer, replyMarkup: replyKeyboardMarkup);
-							break;
-						}
-				}
+				await bot.SendTextMessageAsync(chatId, result.Response, replyMarkup: result.ReplyMarkup);
 
 				Console.WriteLine($"{DateTime.UtcNow}: Handled query from {args.Message.Chat.Username}:\r\n" +
-					queryBeginning);
+				                  queryBeginning);
 			}
 			catch (Exception e)
 			{
 				Console.WriteLine($"{DateTime.UtcNow}: {e}");
-				bot.SendTextMessageAsync(chatId, $"This thing just said: {e.Message}");
+				await bot.SendTextMessageAsync(chatId, $"This thing just said: {e.Message}");
 			}
 		}
 
-		private static IDictionary<string, HashSet<string>> SendRequest(string query)
+		private static string GetCommand(string userInput)
+		{
+			var x = userInput.IndexOf(' ');
+			var y = new string(userInput.Skip(1).TakeWhile(c => c != ' ').ToArray());
+			return userInput.FirstOrDefault() != '/'
+				? ""
+				: y;
+		}
+
+		private delegate RequestResult RequestHandler(string query, long chatId);
+
+		private static Dictionary<string, RequestHandler> _requestHandlers = new Dictionary<string, RequestHandler>
+		{
+			{"", SendDocumentionRequest},
+			{"category", SendPreferencesRequest}
+		};
+
+		private static RequestResult SendDocumentionRequest(string query, long chatId)
 		{
 			var request = WebRequest.Create($"http://127.0.0.1:1234/?query={query}");
+			var response = request.GetResponse();
+			var responseStream = response.GetResponseStream();
+
+			IDictionary<string, HashSet<string>> responseXml;
+			string responseString;
+
+			using (var reader =
+				new StreamReader(responseStream ?? throw new ArgumentNullException(nameof(responseStream))))
+			{
+				var content = reader.ReadToEnd();
+				responseXml = JsonConvert.DeserializeObject<IDictionary<string, HashSet<string>>>(content);
+				responseString = $"{responseXml["Name"].First()}\r\n\r\n" +
+					$"{responseXml["Description"].First()}\r\n\r\n" +
+					$"{responseXml["MsdnUrl"].First()}";
+			}
+
+			var inlineKeyboardButtons = responseXml
+				.Select(pair => new InlineKeyboardButton
+					{Text = pair.Key, Url = $"http://127.0.0.1:1234/?query={pair.Key}&chatId={chatId}"})
+				.Select(b => new List<InlineKeyboardButton> {b})
+				.ToList();
+			var replyKeyboardMarkup = new InlineKeyboardMarkup(inlineKeyboardButtons);
+
+			return new RequestResult(responseString, replyKeyboardMarkup);
+		}
+
+		private static RequestResult SendPreferencesRequest(string query, long chatId)
+		{
+			query = new string(query.Skip(query.IndexOf(' ') + 1).ToArray());
+			var request = WebRequest.Create($"http://127.0.0.1:1234/?category={query}&chatId={chatId}");
 			var response = request.GetResponse();
 			var responseStream = response.GetResponseStream();
 
 			using (var reader = new StreamReader(responseStream))
 			{
 				var content = reader.ReadToEnd();
-				return JsonConvert.DeserializeObject<IDictionary<string, HashSet<string>>>(content);
+				var result = JsonConvert.DeserializeObject<bool>(content);
+				return result
+					? new RequestResult("Preferences changed.", null)
+					: new RequestResult("Failed to change preferences.", null);
 			}
 		}
 	}

@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace MsdnSpy.Core.Common
 {
@@ -6,14 +8,14 @@ namespace MsdnSpy.Core.Common
 	/// Базовый класс всех DDD сущностей.
 	/// </summary>
 	/// <typeparam name="TId">Тип идентификатора</typeparam>
-	public class Entity<TId>
+	public class Entity<TId> 
 	{
 		public Entity(TId id)
 		{
 			Id = id;
 		}
 
-		public TId Id { get; }
+		public TId Id { get; set; }
 
 		protected bool Equals(Entity<TId> other)
 		{
