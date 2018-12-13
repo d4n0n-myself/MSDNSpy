@@ -8,19 +8,20 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 
 namespace MsdnSpy.Domain
 {
 	public class FromMsdnGetter : IInfoGetter
 	{
-		public FromMsdnGetter(PageDownloader pageDownloader)
+		public FromMsdnGetter(WebClient webClient)
 		{
-			_pageDownloader = pageDownloader ?? throw new ArgumentNullException(nameof(pageDownloader));
+			_webClient = webClient ?? throw new ArgumentNullException(nameof(webClient));
 		}
 
 		public IDictionary<string, HashSet<string>> GetInfoByQuery(string query)
 		{
-			var msdnSearchPage = _pageDownloader.DownloadPage(
+			var msdnSearchPage = _webClient.DownloadString(
 				$"https://social.msdn.microsoft.com/Search/ru-RU?query={query}");
 			var msdnUrl = GetMsdnUrlFromSearchPage(msdnSearchPage);
 
@@ -28,12 +29,12 @@ namespace MsdnSpy.Domain
 			var description = "";
 			try
 			{
-				var msdnPage = _pageDownloader.DownloadPage(msdnUrl);
+				var msdnPage = _webClient.DownloadString(msdnUrl);
 				var parsedMsdnPage = new HtmlParser().Parse(msdnPage);
 
 				var githubUrl = GetGithubUrlFromMsdnPage(parsedMsdnPage)
 					.Replace("blob", "raw");
-				var githubPage = _pageDownloader.DownloadPage(githubUrl);
+				var githubPage = _webClient.DownloadString(githubUrl);
 				var parsedGithubPage = new XmlParser().Parse(githubPage);
 
 				//var name = parsedMsdnPage.GetElementsBy("html > head > meta", new Dictionary<string, string>
@@ -54,7 +55,7 @@ namespace MsdnSpy.Domain
 			};
 		}
 
-		private readonly PageDownloader _pageDownloader;
+		private readonly WebClient _webClient;
 
 		private string GetGithubUrlFromMsdnPage(IDocument msdnPage)
 		{

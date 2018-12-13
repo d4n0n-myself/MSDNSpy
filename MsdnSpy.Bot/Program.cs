@@ -14,8 +14,7 @@ namespace MsdnSpy.Bot
 	{
 		private static readonly BotSettings Settings
 			= new Infrastructure.ConfigurationProvider("botconfig.json").Config
-				.GetSection("BotSection")
-				.Get<BotSettings>();
+				.GetSection("BotSettings").Get<BotSettings>();
 
 		private static void Main(string[] args)
 		{

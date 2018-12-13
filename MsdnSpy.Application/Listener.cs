@@ -1,3 +1,4 @@
+using MsdnSpy.Infrastructure.Settings;
 using Newtonsoft.Json;
 using System;
 using System.IO;
@@ -7,20 +8,13 @@ namespace MsdnSpy.Application
 {
 	public class Listener
 	{
-		public Listener(string url, Server server)
+		public Listener(ApplicationSettings settings, Server server)
 		{
+			_prefix = settings.ServerPrefix;
 			_httpListener = new HttpListener();
-			_httpListener.Prefixes.Add(url);
-			_url = url;
+			_httpListener.Prefixes.Add(_prefix);
 
 			_server = server ?? throw new ArgumentNullException(nameof(server));
-		}
-
-		public static Listener RunNew(string url, Server server)
-		{
-			var listener = new Listener(url, server);
-			listener.Run();
-			return listener;
 		}
 
 		public void Run()
@@ -32,7 +26,7 @@ namespace MsdnSpy.Application
 			try
 			{
 				_httpListener.Start();
-				Console.WriteLine($"Now listening on {_url}");
+				Console.WriteLine($"Now listening on {_prefix}");
 
 				Listen();
 			}
@@ -46,7 +40,7 @@ namespace MsdnSpy.Application
 
 		private readonly HttpListener _httpListener;
 		private readonly Server _server;
-		private readonly string _url;
+		private readonly string _prefix;
 
 		private void Listen()
 		{

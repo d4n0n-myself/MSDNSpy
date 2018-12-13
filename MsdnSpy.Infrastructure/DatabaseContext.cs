@@ -10,18 +10,16 @@ namespace MsdnSpy.Infrastructure
 		public DbSet<User> Users { get; private set; }
 		public DbSet<UserPreferences> UserPreferences { get; private set; }
 
-		public DatabaseContext()
-		{
-			_connectionString = new ConfigurationProvider("appconfig.json").Config
-				.GetSection("DatabaseSection").Get<DatabaseSettings>()
-				.ConnectionString;
-		}
+		//public DatabaseContext()
+		//{
+		//	_connectionString = new ConfigurationProvider("appconfig.json").Config
+		//		.GetSection("DatabaseSettings").Get<DatabaseSettings>()
+		//		.ConnectionString;
+		//}
 
-		public DatabaseContext(IConfigurationProvider configurationProvider)
+		public DatabaseContext(DatabaseSettings settings)
 		{
-			_connectionString = configurationProvider.Config
-				.GetSection("DatabaseSection").Get<DatabaseSettings>()
-				.ConnectionString;
+			_connectionString = settings.ConnectionString;
 		}
 
 		protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

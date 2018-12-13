@@ -1,5 +1,4 @@
 ﻿using MsdnSpy.Domain;
-using MsdnSpy.Domain.Helpers;
 using MsdnSpy.Infrastructure;
 using System;
 using System.Net;
@@ -8,6 +7,14 @@ namespace MsdnSpy.Application
 {
 	public class Server
 	{
+		public Server(
+			IInfoGetter infoGetter,
+			IUserPreferencesRepository preferencesStorage)
+		{
+			_infoGetter = infoGetter ?? throw new ArgumentNullException(nameof(infoGetter));
+			_preferencesStorage = preferencesStorage ?? throw new ArgumentNullException(nameof(preferencesStorage));
+		}
+
 		public object HandleRequest(HttpListenerContext context)
 		{
 			try
@@ -26,16 +33,15 @@ namespace MsdnSpy.Application
 			}
 		}
 
-		private static readonly DatabaseContext _databaseContext = new DatabaseContext(new ConfigurationProvider("appconfig.json"));
-		private static readonly IUserPreferencesRepository _storage = new UserPreferencesRepository(_databaseContext);
+		private readonly IInfoGetter _infoGetter;
+		private readonly IUserPreferencesRepository _preferencesStorage;
 
 		private object HandleDocumentationRequest(HttpListenerContext context)
 		{
 			var query = context.Request.QueryString["query"];
 			Console.WriteLine($"{DateTime.UtcNow}: Received query {query}");
-
-			var infoGetter = new FromMsdnGetter(new PageDownloader(new WebClient()));
-			var result = infoGetter.GetInfoByQuery(query);
+			
+			var result = _infoGetter.GetInfoByQuery(query);
 
 			Console.WriteLine($"{DateTime.UtcNow}: Handled query {query}");
 			return result;
@@ -47,7 +53,7 @@ namespace MsdnSpy.Application
 			var category = context.Request.QueryString["category"];
 			Console.WriteLine($"{DateTime.UtcNow}: Received preferences change: {category}");
 
-			var result = _storage.AddCategory(chatId, category);
+			var result = _preferencesStorage.AddCategory(chatId, category);
 
 			Console.WriteLine($"{DateTime.UtcNow}: Handled preferences change: {category}");
 			return result;
