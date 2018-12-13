@@ -36,9 +36,8 @@ namespace MsdnSpy.Bot
 				Console.WriteLine($"{DateTime.UtcNow}: Received query from {args.Message.Chat.Username}:\r\n" +
 				                  queryBeginning);
 
-				var command = GetCommand(args.Message.Text);
-
-				var result = _requestHandlers[command](args.Message.Text, chatId);
+				var parsedInput = ParseInput(args.Message.Text);
+				var result = _requestHandlers[parsedInput.command](parsedInput.args, chatId);
 
 				await bot.SendTextMessageAsync(chatId, result.Response, replyMarkup: result.ReplyMarkup);
 
@@ -52,22 +51,30 @@ namespace MsdnSpy.Bot
 			}
 		}
 
-		private static string GetCommand(string userInput)
-		{
-			var x = userInput.IndexOf(' ');
-			var y = new string(userInput.Skip(1).TakeWhile(c => c != ' ').ToArray());
-			return userInput.FirstOrDefault() != '/'
-				? ""
-				: y;
-		}
+		private delegate RequestResult RequestHandler(string args, long chatId);
 
-		private delegate RequestResult RequestHandler(string query, long chatId);
-
-		private static Dictionary<string, RequestHandler> _requestHandlers = new Dictionary<string, RequestHandler>
+		private static readonly Dictionary<string, RequestHandler> _requestHandlers = new Dictionary<string, RequestHandler>
 		{
-			{"", SendDocumentionRequest},
-			{"category", SendPreferencesRequest}
+			[""] = SendDocumentionRequest,
+			["category"] = SendPreferencesRequest
 		};
+
+		private static (string command, string args) ParseInput(string userInput)
+		{
+			userInput = userInput.Trim();
+			if (userInput.FirstOrDefault() != '/')
+				return ("", userInput);
+
+			var endOfCommand = userInput.IndexOf(' ');
+			if (endOfCommand == -1)
+				endOfCommand = userInput.Length;
+			var command = userInput.Substring(1, endOfCommand - 1);
+
+			var args = endOfCommand == userInput.Length
+				? ""
+				: userInput.Substring(endOfCommand + 1, userInput.Length - endOfCommand - 1);
+			return (command, args);
+		}
 
 		private static RequestResult SendDocumentionRequest(string query, long chatId)
 		{
@@ -75,32 +82,30 @@ namespace MsdnSpy.Bot
 			var response = request.GetResponse();
 			var responseStream = response.GetResponseStream();
 
-			IDictionary<string, HashSet<string>> responseXml;
-			string responseString;
+			IDictionary<string, HashSet<string>> parsedResponse;
+			string result;
 
-			using (var reader =
-				new StreamReader(responseStream ?? throw new ArgumentNullException(nameof(responseStream))))
+			using (var reader = new StreamReader(responseStream))
 			{
 				var content = reader.ReadToEnd();
-				responseXml = JsonConvert.DeserializeObject<IDictionary<string, HashSet<string>>>(content);
-				responseString = $"{responseXml["Name"].First()}\r\n\r\n" +
-					$"{responseXml["Description"].First()}\r\n\r\n" +
-					$"{responseXml["MsdnUrl"].First()}";
+				parsedResponse = JsonConvert.DeserializeObject<IDictionary<string, HashSet<string>>>(content);
+				result = $"{parsedResponse["Name"].First()}\r\n\r\n" +
+					$"{parsedResponse["Description"].First()}\r\n\r\n" +
+					$"{parsedResponse["MsdnUrl"].First()}";
 			}
 
-			var inlineKeyboardButtons = responseXml
+			var inlineKeyboardButtons = parsedResponse
 				.Select(pair => new InlineKeyboardButton
 					{Text = pair.Key, Url = $"http://127.0.0.1:1234/?query={pair.Key}&chatId={chatId}"})
 				.Select(b => new List<InlineKeyboardButton> {b})
 				.ToList();
 			var replyKeyboardMarkup = new InlineKeyboardMarkup(inlineKeyboardButtons);
 
-			return new RequestResult(responseString, replyKeyboardMarkup);
+			return new RequestResult(result, replyKeyboardMarkup);
 		}
 
 		private static RequestResult SendPreferencesRequest(string query, long chatId)
 		{
-			query = new string(query.Skip(query.IndexOf(' ') + 1).ToArray());
 			var request = WebRequest.Create($"http://127.0.0.1:1234/?category={query}&chatId={chatId}");
 			var response = request.GetResponse();
 			var responseStream = response.GetResponseStream();
