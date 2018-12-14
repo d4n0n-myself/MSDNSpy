@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Args;
 using Telegram.Bot.Types.ReplyMarkups;
@@ -36,13 +37,16 @@ namespace MsdnSpy.Bot
 				Console.WriteLine($"{DateTime.UtcNow}: Received query from {args.Message.Chat.Username}:\r\n" +
 				                  queryBeginning);
 
-				var parsedInput = ParseInput(args.Message.Text);
-				var result = _requestHandlers[parsedInput.command](parsedInput.args, chatId);
+				Task.Run(() =>
+				{
+					var parsedInput = ParseInput(args.Message.Text);
+					var result = _requestHandlers[parsedInput.command](parsedInput.args, chatId);
 
-				await bot.SendTextMessageAsync(chatId, result.Response, replyMarkup: result.ReplyMarkup);
+					bot.SendTextMessageAsync(chatId, result.Response, replyMarkup: result.ReplyMarkup).Wait();
 
-				Console.WriteLine($"{DateTime.UtcNow}: Handled query from {args.Message.Chat.Username}:\r\n" +
-				                  queryBeginning);
+					Console.WriteLine($"{DateTime.UtcNow}: Handled query from {args.Message.Chat.Username}:\r\n" +
+											queryBeginning);
+				});
 			}
 			catch (Exception e)
 			{

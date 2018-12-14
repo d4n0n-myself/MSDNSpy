@@ -3,18 +3,19 @@ using Newtonsoft.Json;
 using System;
 using System.IO;
 using System.Net;
+using System.Threading.Tasks;
 
 namespace MsdnSpy.Application
 {
 	public class Listener
 	{
-		public Listener(ApplicationSettings settings, Server server)
+		public Listener(ApplicationSettings settings, Func<Server> serverProvider)
 		{
 			_prefix = settings.ServerPrefix;
 			_httpListener = new HttpListener();
 			_httpListener.Prefixes.Add(_prefix);
 
-			_server = server ?? throw new ArgumentNullException(nameof(server));
+			_serverProvider = serverProvider ?? throw new ArgumentNullException(nameof(serverProvider));
 		}
 
 		public void Run()
@@ -39,7 +40,7 @@ namespace MsdnSpy.Application
 		private bool _isListening;
 
 		private readonly HttpListener _httpListener;
-		private readonly Server _server;
+		private readonly Func<Server> _serverProvider;
 		private readonly string _prefix;
 
 		private void Listen()
@@ -50,11 +51,14 @@ namespace MsdnSpy.Application
 				{
 					var context = _httpListener.GetContext();
 
-					var result = _server.HandleRequest(context);
+					Task.Run(() =>
+					{
+						var result = _serverProvider().HandleRequest(context);
 
-					var jsonResult = JsonConvert.SerializeObject(result);
-					using (var output = new StreamWriter(context.Response.OutputStream))
-						output.Write(jsonResult);
+						var jsonResult = JsonConvert.SerializeObject(result);
+						using (var output = new StreamWriter(context.Response.OutputStream))
+							output.Write(jsonResult);
+					});
 				}
 			}
 			catch (Exception e)

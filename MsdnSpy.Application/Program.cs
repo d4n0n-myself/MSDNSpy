@@ -48,6 +48,8 @@ namespace MsdnSpy.Application
 		private static void SetupApplication(StandardKernel diContainer)
 		{
 			diContainer.Bind<Listener>().ToSelf().InSingletonScope();
+			diContainer.Bind<Func<Server>>().ToMethod(
+				x => () => x.Kernel.Get<Server>());
 			diContainer.Bind<IInfoGetter>().To<FromMsdnGetter>();
 			diContainer.Bind<WebClient>().ToMethod(x =>
 			{
