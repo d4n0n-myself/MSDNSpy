@@ -9,9 +9,9 @@ namespace MsdnSpy.Bot.Common
 
 		public abstract RequestResult HandleRequest(string args, long chatId);
 
-		protected T GetObjectFromUrl<T>(string url, string bodyContent, out WebException webError)
+		protected T GetObjectFromUrl<T>(string url, out WebException webError)
 		{
-			var request = CreateRequest(url, bodyContent);
+			var request = WebRequest.Create(url);
 
 			WebResponse response;
 			try
@@ -27,13 +27,6 @@ namespace MsdnSpy.Bot.Common
 			webError = null;
 			var responseContent = response.GetResponseStream().ReadToEnd();
 			return JsonConvert.DeserializeObject<T>(responseContent);
-		}
-
-		private static WebRequest CreateRequest(string url, string bodyContent)
-		{
-			var request = WebRequest.Create(url);
-			request.GetRequestStream().Write(bodyContent);
-			return request;
 		}
 	}
 }

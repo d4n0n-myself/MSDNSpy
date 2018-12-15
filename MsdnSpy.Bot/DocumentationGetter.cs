@@ -13,7 +13,6 @@ namespace MsdnSpy.Bot
 		{
 			var documentation = GetObjectFromUrl<IDictionary<string, HashSet<string>>>(
 				$"http://127.0.0.1:1234/?query={query}",
-				null,
 				out var webError
 			);
 			if (webError != null)

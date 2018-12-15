@@ -23,13 +23,12 @@ namespace MsdnSpy.Application
 					? HandlePreferencesRequest(context)
 					: HandleDocumentationRequest(context);
 			}
-			catch (Exception e)
+			catch (Exception exception)
 			{
 				context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
-				var errorMessage = e.ToString();
 
-				Console.WriteLine($"{DateTime.UtcNow}: {errorMessage}");
-				return errorMessage;
+				Console.WriteLine($"{DateTime.UtcNow}: {exception}");
+				return exception.Message;
 			}
 		}
 

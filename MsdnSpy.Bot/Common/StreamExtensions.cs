@@ -14,5 +14,6 @@ namespace MsdnSpy.Bot.Common
 		{
 			using (var writer = new StreamWriter(stream))
 				writer.Write(content);
+		}
 	}
 }
