@@ -24,17 +24,10 @@ namespace MsdnSpy.Application
 				return;
 
 			_isListening = true;
-			try
-			{
-				_httpListener.Start();
-				Console.WriteLine($"Now listening on {_prefix}");
+			_httpListener.Start();
+			Console.WriteLine($"Now listening on {_prefix}");
 
-				Listen();
-			}
-			finally
-			{
-				_isListening = false;
-			}
+			Listen();
 		}
 
 		private bool _isListening;

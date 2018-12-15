@@ -1,6 +1,7 @@
 ﻿using com.LandonKey.SocksWebProxy;
 using com.LandonKey.SocksWebProxy.Proxy;
 using Microsoft.Extensions.Configuration;
+using MsdnSpy.Bot.Common;
 using MsdnSpy.Infrastructure.Settings;
 using System;
 using System.Collections.Generic;
@@ -12,9 +13,17 @@ namespace MsdnSpy.Bot
 {
 	public static class Program
 	{
-		private static readonly BotSettings Settings
-			= new Infrastructure.ConfigurationProvider("botconfig.json").Config
+		private static readonly BotSettings Settings;
+		private static readonly MessageDispatcher MessageDispatcher;
+
+		static Program()
+		{
+			Settings = new Infrastructure.ConfigurationProvider("botconfig.json").Config
 				.GetSection("BotSettings").Get<BotSettings>();
+
+			MessageDispatcher = new MessageDispatcher(new IRequestHandler[]
+				{ new DocumentationGetter(), new PreferenceSender() });
+		}
 
 		private static void Main(string[] args)
 		{
@@ -40,6 +49,17 @@ namespace MsdnSpy.Bot
 			}
 		}
 
+		private static void StartBots(IEnumerable<ITelegramBotClient> bots)
+		{
+			foreach (var bot in bots)
+			{
+				bot.OnMessage += MessageDispatcher.HandleMessage;
+
+				Task.Run(() => bot.StartReceiving());
+				Console.WriteLine($"Started bot with id {bot.BotId}");
+			}
+		}
+
 		private static SocksWebProxy GetProxy(
 			ProxySettings proxySettings,
 			IPAddress selfIp,
@@ -56,17 +76,6 @@ namespace MsdnSpy.Bot
 				proxySettings.Password
 			);
 			return new SocksWebProxy(proxyConfig, allowBypass: false);
-		}
-
-		private static void StartBots(IEnumerable<ITelegramBotClient> bots)
-		{
-			foreach (var bot in bots)
-			{
-				bot.OnMessage += BotMessageHandler.HandleMessage;
-
-				Task.Run(() => bot.StartReceiving());
-				Console.WriteLine($"Started bot with id {bot.BotId}");
-			}
 		}
 	}
 }
