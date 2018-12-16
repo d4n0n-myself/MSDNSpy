@@ -1,7 +1,5 @@
 using MsdnSpy.Infrastructure.Settings;
-using Newtonsoft.Json;
 using System;
-using System.IO;
 using System.Net;
 using System.Threading.Tasks;
 
@@ -43,15 +41,7 @@ namespace MsdnSpy.Application
 				while (true)
 				{
 					var context = _httpListener.GetContext();
-
-					Task.Run(() =>
-					{
-						var result = _serverProvider().HandleRequest(context);
-
-						var jsonResult = JsonConvert.SerializeObject(result);
-						using (var output = new StreamWriter(context.Response.OutputStream))
-							output.Write(jsonResult);
-					});
+					Task.Run(() => _serverProvider().HandleRequest(context));
 				}
 			}
 			catch (Exception e)

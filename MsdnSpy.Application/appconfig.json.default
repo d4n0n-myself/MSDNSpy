@@ -1,5 +1,8 @@
 {
-	"DatabaseSection": {
-		"ConnectionString": "\"connect_me\""
+	"ApplicationSettings": {
+		"ServerPrefix": ""
+	},
+	"DatabaseSettings": {
+		"ConnectionString": ""
 	}
 }

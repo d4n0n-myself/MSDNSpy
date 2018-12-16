@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace MsdnSpy.Bot.Common
+namespace MsdnSpy.Infrastructure.Common
 {
 	public static class StreamExtensions
 	{

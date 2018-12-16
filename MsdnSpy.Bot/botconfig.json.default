@@ -1,5 +1,5 @@
 ﻿{
-	"BotSection": {
+	"BotSettings": {
 		"Port": 80,
 		"Token": "BOT_TOKEN",
 		"Proxies": [

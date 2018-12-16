@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using MsdnSpy.Infrastructure.Common;
+using Newtonsoft.Json;
 using System.Net;
 
 namespace MsdnSpy.Bot.Common

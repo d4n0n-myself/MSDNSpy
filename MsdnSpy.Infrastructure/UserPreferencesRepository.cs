@@ -1,9 +1,8 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using MsdnSpy.Core;
 using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace MsdnSpy.Infrastructure
 {
@@ -33,13 +32,12 @@ namespace MsdnSpy.Infrastructure
 		{
 			try
 			{
-				var userPreferences = GetPreferencesByChatId(chatId);
-				var stringg = userPreferences.Preferences;
-				var categoryPreferences = JsonConvert.DeserializeObject<IDictionary<string,bool>>(stringg);
+				var userPreferences = GetPreferencesByChatId(chatId).Preferences;
+				var categoryPreferences = JsonConvert.DeserializeObject<IDictionary<string, bool>>(userPreferences);
 				
 				return true;
 			}
-			catch (Exception e)
+			catch (Exception)
 			{
 				return false;
 			}
