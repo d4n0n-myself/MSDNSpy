@@ -2,9 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using MsdnSpy.Core;
+using MsdnSpy.Infrastructure.Interfaces;
 using Newtonsoft.Json;
 
-namespace MsdnSpy.Infrastructure
+namespace MsdnSpy.Infrastructure.Repositories
 {
 	public class UserRepository : IUserRepository
 	{

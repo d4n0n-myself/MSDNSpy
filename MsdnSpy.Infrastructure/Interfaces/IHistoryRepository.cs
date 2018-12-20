@@ -1,7 +1,6 @@
 using System.Collections.Generic;
-using MsdnSpy.Core;
 
-namespace MsdnSpy.Infrastructure
+namespace MsdnSpy.Infrastructure.Interfaces
 {
 	public interface IHistoryRepository
 	{

@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 
-namespace MsdnSpy.Infrastructure
+namespace MsdnSpy.Infrastructure.Interfaces
 {
 	public interface IConfigurationProvider
 	{
