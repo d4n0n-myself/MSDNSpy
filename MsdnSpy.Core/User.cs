@@ -10,15 +10,9 @@ namespace MsdnSpy.Core
 		{
 			Preferences = JsonConvert.SerializeObject(new Dictionary<string, bool>
 			{
-				{
-					"Name", true
-				},
-				{
-					"MsdnUrl", true
-				},
-				{
-					"Description", true
-				}
+				{"Name", true},
+				{"MsdnUrl", true},
+				{"Description", true}
 			});
 		}
 

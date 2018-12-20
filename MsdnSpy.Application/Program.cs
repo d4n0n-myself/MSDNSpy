@@ -53,8 +53,7 @@ namespace MsdnSpy.Application
 			diContainer.Bind<IInfoGetter>().To<FromMsdnGetter>();
 			diContainer.Bind<WebClient>().ToMethod(x =>
 			{
-				var webClient = new WebClient();
-				webClient.Headers["User-Agent"] = "Mozilla/4.0";
+				var webClient = new WebClient {Headers = {["User-Agent"] = "Mozilla/4.0"}};
 				return webClient;
 			});
 		}
@@ -62,6 +61,7 @@ namespace MsdnSpy.Application
 		private static void SetupDatabase(StandardKernel diContainer)
 		{
 			diContainer.Bind<IUserRepository>().To<UserRepository>();
+			diContainer.Bind<IHistoryRepository>().To<HistoryRepository>();
 		}
 	}
 }

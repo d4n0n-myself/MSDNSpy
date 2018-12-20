@@ -13,16 +13,6 @@ namespace MsdnSpy.Infrastructure
 			_context = context;
 		}
 
-		public User GetUserByUserId(long userId)
-		{
-			var user = new User(userId);
-			if (_context.Users.Contains(user))
-				return _context.Users.SingleOrDefault(up => up.Id == userId);
-			_context.Users.Add(new User(userId));
-			_context.SaveChanges();
-			return user;
-		}
-
 		public bool ChangeCategory(long userId, string categoryName)
 		{
 			try
@@ -40,7 +30,7 @@ namespace MsdnSpy.Infrastructure
 				}
 
 				user.Preferences = JsonConvert.SerializeObject(categoryPreferences);
-				_context.SaveChanges();
+				Save();
 				return true;
 			}
 			catch (Exception)
@@ -67,8 +57,19 @@ namespace MsdnSpy.Infrastructure
 			}
 		}
 
+		private readonly DatabaseContext _context;
+
 		public int Save() => _context.SaveChanges();
 
-		private readonly DatabaseContext _context;
+
+		private User GetUserByUserId(long userId)
+		{
+			var user = new User(userId);
+			if (_context.Users.Contains(user))
+				return _context.Users.SingleOrDefault(up => up.Id == userId);
+			_context.Users.Add(new User(userId));
+			Save();
+			return user;
+		}
 	}
 }

@@ -15,10 +15,12 @@ namespace MsdnSpy.Application
 	{
 		public Server(
 			IInfoGetter infoGetter,
-			IUserRepository storage)
+			IUserRepository storage, 
+			IHistoryRepository history)
 		{
 			_infoGetter = infoGetter ?? throw new ArgumentNullException(nameof(infoGetter));
 			_storage = storage ?? throw new ArgumentNullException(nameof(storage));
+			_history = history ?? throw new ArgumentNullException(nameof(history));
 		}
 
 		public void HandleRequest(HttpListenerContext context)
@@ -46,6 +48,7 @@ namespace MsdnSpy.Application
 
 		private readonly IInfoGetter _infoGetter;
 		private readonly IUserRepository _storage;
+		private readonly IHistoryRepository _history;
 
 		private RequestResult HandleDocumentationRequest(IDictionary<string, string> args)
 		{
@@ -55,13 +58,14 @@ namespace MsdnSpy.Application
 					HttpStatusCode.BadRequest);
 
 			var query = args["query"];
+			var chatId = Convert.ToInt64(args["chatId"]);
 			
 			Console.WriteLine($"{DateTime.UtcNow}: Received query {query}");
 
 			object result;
 			try
 			{
-				IEnumerable<string> preferences = _storage.ShowCategories(Convert.ToInt64(args["chatId"]));
+				IEnumerable<string> preferences = _storage.ShowCategories(chatId);
 				var info = _infoGetter.GetInfoByQuery(query);
 				result = new Dictionary<string, HashSet<string>>(info.Where(e => preferences.Contains(e.Key)));
 			}
@@ -73,6 +77,7 @@ namespace MsdnSpy.Application
 			}
 
 			Console.WriteLine($"{DateTime.UtcNow}: Handled query {query}");
+			_history.AddEntry(chatId, query);
 			return new RequestResult(result);
 		}
 

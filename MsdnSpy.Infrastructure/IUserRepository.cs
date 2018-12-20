@@ -6,9 +6,7 @@ namespace MsdnSpy.Infrastructure
 {
 	public interface IUserRepository
 	{
-		User GetUserByUserId(long userId);
 		bool ChangeCategory(long userId, string categoryName);
 		IEnumerable<string> ShowCategories(long userId);
-		int Save();
 	}
 }
