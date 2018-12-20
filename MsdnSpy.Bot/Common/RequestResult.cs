@@ -10,7 +10,6 @@ namespace MsdnSpy.Bot.Common
 
 		public readonly IReplyMarkup ReplyMarkup;
 		public readonly string Response;
-
 		public readonly WebException WebError;
 		public readonly string ErrorMessage;
 

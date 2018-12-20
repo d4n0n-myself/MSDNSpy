@@ -1,6 +1,7 @@
 ﻿using MsdnSpy.Bot.Common;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.EntityFrameworkCore.Internal;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace MsdnSpy.Bot
@@ -12,15 +13,13 @@ namespace MsdnSpy.Bot
 		public override RequestResult HandleRequest(string query, long chatId)
 		{
 			var documentation = GetObjectFromUrl<IDictionary<string, HashSet<string>>>(
-				$"http://127.0.0.1:1234/?query={query}",
+				$"http://127.0.0.1:1234/?query={query}&chatId={chatId}",
 				out var webError
 			);
 			if (webError != null)
 				return new RequestResult(webError);
 
-			var result = $"{documentation["Name"].First()}\r\n\r\n" +
-			             $"{documentation["Description"].First()}\r\n\r\n" +
-			             $"{documentation["MsdnUrl"].First()}";
+			var result = documentation.Select(e => e.Value.First()).Join("\r\n\r\n");
 			
 			var inlineKeyboardButtons = documentation
 				.Select(pair => new InlineKeyboardButton

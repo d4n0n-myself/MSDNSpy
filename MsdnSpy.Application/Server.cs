@@ -3,6 +3,7 @@ using MsdnSpy.Infrastructure;
 using MsdnSpy.Infrastructure.Common;
 using Newtonsoft.Json;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -27,6 +28,7 @@ namespace MsdnSpy.Application
 			{
 				var args = context.Request.QueryString.AllKeys
 					.ToDictionary(key => key, key => context.Request.QueryString[key]);
+				var chatId = context.Request.QueryString["chatId"];
 				result = context.Request.QueryString["query"] == null
 					? HandlePreferencesRequest(args)
 					: HandleDocumentationRequest(args);
@@ -49,16 +51,19 @@ namespace MsdnSpy.Application
 		{
 			if (!args.ContainsKey("query"))
 				return new RequestResult(
-					@"Expected ""query"" parameter",
+					@"Expected ""query"" parameter", 
 					HttpStatusCode.BadRequest);
 
 			var query = args["query"];
+			
 			Console.WriteLine($"{DateTime.UtcNow}: Received query {query}");
 
 			object result;
 			try
 			{
-				result = _infoGetter.GetInfoByQuery(query);
+				IEnumerable<string> preferences = _storage.ShowCategories(Convert.ToInt64(args["chatId"]));
+				var info = _infoGetter.GetInfoByQuery(query);
+				result = new Dictionary<string, HashSet<string>>(info.Where(e => preferences.Contains(e.Key)));
 			}
 			catch (Exception)
 			{
@@ -76,7 +81,7 @@ namespace MsdnSpy.Application
 			if (!args.ContainsKey("chatId") ||
 				 !args.ContainsKey("category"))
 				return new RequestResult(
-					@"Expected ""chatId"" and ""category"" parameters",
+					@"Expected ""chatId"" and ""category"" parameters", 
 					HttpStatusCode.BadRequest);
 
 			if (!long.TryParse(args["chatId"], out var chatId))
