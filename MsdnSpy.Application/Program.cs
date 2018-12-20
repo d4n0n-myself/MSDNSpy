@@ -61,7 +61,7 @@ namespace MsdnSpy.Application
 
 		private static void SetupDatabase(StandardKernel diContainer)
 		{
-			diContainer.Bind<IUserPreferencesRepository>().To<UserPreferencesRepository>();
+			diContainer.Bind<IUserRepository>().To<UserRepository>();
 		}
 	}
 }
