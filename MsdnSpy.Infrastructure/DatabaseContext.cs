@@ -8,14 +8,15 @@ namespace MsdnSpy.Infrastructure
 	public class DatabaseContext : DbContext
 	{
 		public DbSet<User> Users { get; private set; }
-
+		public DbSet<HistoryEntry> History { get; set; }
+		
 		// For migration creations
-//		public DatabaseContext()
-//		{
-//			_connectionString = new ConfigurationProvider("appconfig.json").Config
-//				.GetSection("DatabaseSettings").Get<DatabaseSettings>()
-//				.ConnectionString;
-//		}
+		public DatabaseContext()
+		{
+			_connectionString = new ConfigurationProvider("appconfig.json").Config
+				.GetSection("DatabaseSettings").Get<DatabaseSettings>()
+				.ConnectionString;
+		}
 
 		public DatabaseContext(DatabaseSettings settings)
 		{
