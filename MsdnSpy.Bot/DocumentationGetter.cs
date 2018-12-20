@@ -21,10 +21,11 @@ namespace MsdnSpy.Bot
 			var result = $"{documentation["Name"].First()}\r\n\r\n" +
 			             $"{documentation["Description"].First()}\r\n\r\n" +
 			             $"{documentation["MsdnUrl"].First()}";
+			
 			var inlineKeyboardButtons = documentation
 				.Select(pair => new InlineKeyboardButton
-				{ Text = pair.Key, Url = $"http://127.0.0.1:1234/?query={pair.Key}&chatId={chatId}" })
-				.Select(b => new List<InlineKeyboardButton> { b })
+					{Text = pair.Key, Url = $"http://127.0.0.1:1234/?query={pair.Key}&chatId={chatId}"})
+				.Select(b => new List<InlineKeyboardButton> {b})
 				.ToList();
 			var replyKeyboardMarkup = new InlineKeyboardMarkup(inlineKeyboardButtons);
 
