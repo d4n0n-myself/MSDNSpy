@@ -17,7 +17,6 @@ namespace MsdnSpy.Bot
 			if (webError != null)
 				return new RequestResult(webError);
 
-//			var result = JsonConvert.DeserializeObject<HistoryEntry[]>(history.ToString());
 			var result = history.Join("\r\n");
 
 			return new RequestResult(result, null);

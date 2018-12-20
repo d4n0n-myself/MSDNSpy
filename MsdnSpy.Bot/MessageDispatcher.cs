@@ -13,7 +13,7 @@ namespace MsdnSpy.Bot
 		public MessageDispatcher(IRequestHandler[] requestHandlers)
 		{
 			_requestHandlers = requestHandlers?.ToDictionary(handler => handler.Command)
-				?? throw new ArgumentNullException(nameof(requestHandlers));
+			                   ?? throw new ArgumentNullException(nameof(requestHandlers));
 		}
 
 		public async void HandleMessage(object sender, MessageEventArgs args)
@@ -23,7 +23,7 @@ namespace MsdnSpy.Bot
 
 			try
 			{
-				bot = (ITelegramBotClient)sender;
+				bot = (ITelegramBotClient) sender;
 				chatId = args.Message.Chat.Id;
 			}
 			catch (Exception e)
@@ -38,7 +38,7 @@ namespace MsdnSpy.Bot
 				var queryBeginning = query.Substring(0, Math.Min(query.Length, 50));
 
 				Console.WriteLine($"{DateTime.UtcNow}: Received query from {args.Message.Chat.Username}:\r\n" +
-										queryBeginning);
+				                  queryBeginning);
 
 				await Task.Run(async () =>
 				{
@@ -47,12 +47,13 @@ namespace MsdnSpy.Bot
 						await bot.SendTextMessageAsync(chatId, "D A R O V A");
 						return;
 					}
+
 					var (command, commandArgs) = ParseInput(args.Message.Text);
 					if (!_requestHandlers.TryGetValue(command, out var requestHandler))
 					{
 						ReportError(bot, chatId,
 							$"{DateTime.UtcNow}: Not found handler for query from {args.Message.Chat.Username}:\r\n" +
-								$"{queryBeginning}",
+							$"{queryBeginning}",
 							"Unknown command");
 						return;
 					}
@@ -62,14 +63,14 @@ namespace MsdnSpy.Bot
 					{
 						ReportError(bot, chatId,
 							$"{DateTime.UtcNow}: Failed to handle query from {args.Message.Chat.Username}:\r\n" +
-								$"{queryBeginning}\r\n" +
-								$"Error message: {result.ErrorMessage}",
+							$"{queryBeginning}\r\n" +
+							$"Error message: {result.ErrorMessage}",
 							result.ErrorMessage);
 						return;
 					}
-					
+
 					Console.WriteLine($"{DateTime.UtcNow}: Handled query from {args.Message.Chat.Username}:\r\n" +
-											queryBeginning);
+					                  queryBeginning);
 					await bot.SendTextMessageAsync(chatId, result.Response, replyMarkup: result.ReplyMarkup);
 				});
 			}
@@ -86,14 +87,15 @@ namespace MsdnSpy.Bot
 			try
 			{
 				var bot = (ITelegramBotClient) sender;
-				await bot.AnswerCallbackQueryAsync(args.CallbackQuery.Id, "ebat ono raboteat nahooi");
+				await bot.SendTextMessageAsync(args.CallbackQuery.Message.Chat.Id,
+					Program.LastRequests[args.CallbackQuery.From.Id][args.CallbackQuery.Data].FirstOrDefault());
 			}
 			catch (Exception e)
 			{
 				Console.WriteLine(e);
 			}
 		}
-		
+
 		private readonly Dictionary<string, IRequestHandler> _requestHandlers;
 
 		private static (string command, string args) ParseInput(string userInput)

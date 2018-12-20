@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using IConfigurationProvider = MsdnSpy.Infrastructure.Interfaces.IConfigurationProvider;
 
 namespace MsdnSpy.Infrastructure
 {

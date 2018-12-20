@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using Microsoft.EntityFrameworkCore.Internal;
+using MsdnSpy.Infrastructure.Interfaces;
 
 namespace MsdnSpy.Application
 {

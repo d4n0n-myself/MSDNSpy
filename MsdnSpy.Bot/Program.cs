@@ -15,6 +15,7 @@ namespace MsdnSpy.Bot
 	{
 		private static readonly BotSettings Settings;
 		private static readonly MessageDispatcher MessageDispatcher;
+		internal static readonly IDictionary<long, IDictionary<string, HashSet<string>>> LastRequests;
 
 		static Program()
 		{
@@ -22,7 +23,9 @@ namespace MsdnSpy.Bot
 				.GetSection("BotSettings").Get<BotSettings>();
 
 			MessageDispatcher = new MessageDispatcher(new IRequestHandler[]
-				{ new DocumentationGetter(), new PreferenceSender(), new HistoryHelper() });
+				{new DocumentationGetter(), new PreferenceSender(), new HistoryHelper()});
+
+			LastRequests = new Dictionary<long, IDictionary<string, HashSet<string>>>();
 		}
 
 		private static void Main(string[] args)

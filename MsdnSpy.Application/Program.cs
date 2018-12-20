@@ -5,7 +5,9 @@ using MsdnSpy.Infrastructure.Settings;
 using Ninject;
 using System;
 using System.Net;
-using IConfigurationProvider = MsdnSpy.Infrastructure.IConfigurationProvider;
+using MsdnSpy.Infrastructure.Interfaces;
+using MsdnSpy.Infrastructure.Repositories;
+using IConfigurationProvider = MsdnSpy.Infrastructure.Interfaces.IConfigurationProvider;
 
 namespace MsdnSpy.Application
 {

@@ -19,11 +19,19 @@ namespace MsdnSpy.Bot
 			if (webError != null)
 				return new RequestResult(webError);
 
+			lock (Program.LastRequests)
+			{
+				Program.LastRequests[chatId] = documentation;
+			}
+
 			var result = documentation.Select(e => e.Value.First()).Join("\r\n\r\n");
-			
+
 			var inlineKeyboardButtons = documentation
 				.Select(pair => new InlineKeyboardButton
-					{Text = pair.Key, Url = $"http://127.0.0.1:1234/?query={pair.Key}&chatId={chatId}"})
+				{
+					Text = pair.Key,
+					CallbackData = pair.Key
+				})
 				.Select(b => new List<InlineKeyboardButton> {b})
 				.ToList();
 			var replyKeyboardMarkup = new InlineKeyboardMarkup(inlineKeyboardButtons);
