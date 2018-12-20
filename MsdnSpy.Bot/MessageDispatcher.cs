@@ -42,6 +42,11 @@ namespace MsdnSpy.Bot
 
 				await Task.Run(async () =>
 				{
+					if (args.Message.Text == "/start")
+					{
+						await bot.SendTextMessageAsync(chatId, "D A R O V A");
+						return;
+					}
 					var (command, commandArgs) = ParseInput(args.Message.Text);
 					if (!_requestHandlers.TryGetValue(command, out var requestHandler))
 					{

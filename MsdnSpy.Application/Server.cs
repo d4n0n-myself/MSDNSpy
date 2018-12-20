@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using Microsoft.EntityFrameworkCore.Internal;
 
 namespace MsdnSpy.Application
 {
@@ -13,10 +14,10 @@ namespace MsdnSpy.Application
 	{
 		public Server(
 			IInfoGetter infoGetter,
-			IUserPreferencesRepository preferencesStorage)
+			IUserRepository storage)
 		{
 			_infoGetter = infoGetter ?? throw new ArgumentNullException(nameof(infoGetter));
-			_preferencesStorage = preferencesStorage ?? throw new ArgumentNullException(nameof(preferencesStorage));
+			_storage = storage ?? throw new ArgumentNullException(nameof(storage));
 		}
 
 		public void HandleRequest(HttpListenerContext context)
@@ -42,7 +43,7 @@ namespace MsdnSpy.Application
 		}
 
 		private readonly IInfoGetter _infoGetter;
-		private readonly IUserPreferencesRepository _preferencesStorage;
+		private readonly IUserRepository _storage;
 
 		private RequestResult HandleDocumentationRequest(IDictionary<string, string> args)
 		{
@@ -84,8 +85,11 @@ namespace MsdnSpy.Application
 					HttpStatusCode.BadRequest);
 			var category = args["category"];
 			Console.WriteLine($"{DateTime.UtcNow}: Received preferences change: {category}");
-
-			var result = _preferencesStorage.AddCategory(chatId, category);
+			object result;
+			if (category == "show")
+				result = _storage.ShowCategories(chatId).Join("\r\n");
+			else
+				result = _storage.ChangeCategory(chatId, category);
 
 			Console.WriteLine($"{DateTime.UtcNow}: Handled preferences change: {category}");
 			return new RequestResult(result);
