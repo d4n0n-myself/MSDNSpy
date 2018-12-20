@@ -20,10 +20,8 @@ namespace MsdnSpy.Core
 					"Description", true
 				}
 			});
-			Username = "";
 		}
 
 		public string Preferences { get; set; }
-		public string Username { get; set; }
 	}
 }
