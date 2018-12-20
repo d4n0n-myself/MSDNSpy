@@ -15,7 +15,7 @@ namespace MsdnSpy.Application
 	{
 		public Server(
 			IInfoGetter infoGetter,
-			IUserRepository storage, 
+			IUserRepository storage,
 			IHistoryRepository history)
 		{
 			_infoGetter = infoGetter ?? throw new ArgumentNullException(nameof(infoGetter));
@@ -30,18 +30,20 @@ namespace MsdnSpy.Application
 			{
 				var args = context.Request.QueryString.AllKeys
 					.ToDictionary(key => key, key => context.Request.QueryString[key]);
-				var chatId = context.Request.QueryString["chatId"];
-				result = context.Request.QueryString["query"] == null
-					? HandlePreferencesRequest(args)
-					: HandleDocumentationRequest(args);
+				if (context.Request.QueryString["history"] != null)
+					result = HandleHistoryRequest(args);
+				else
+					result = context.Request.QueryString["query"] == null
+						? HandlePreferencesRequest(args)
+						: HandleDocumentationRequest(args);
 			}
 			catch (Exception exception)
 			{
 				Console.WriteLine($"{DateTime.UtcNow}: {exception}");
 				result = new RequestResult(exception.Message, HttpStatusCode.InternalServerError);
 			}
-			
-			context.Response.StatusCode = (int)result.StatusCode;
+
+			context.Response.StatusCode = (int) result.StatusCode;
 			var jsonResult = JsonConvert.SerializeObject(result.BodyContent);
 			context.Response.OutputStream.Write(jsonResult);
 		}
@@ -54,12 +56,12 @@ namespace MsdnSpy.Application
 		{
 			if (!args.ContainsKey("query"))
 				return new RequestResult(
-					@"Expected ""query"" parameter", 
+					@"Expected ""query"" parameter",
 					HttpStatusCode.BadRequest);
 
 			var query = args["query"];
 			var chatId = Convert.ToInt64(args["chatId"]);
-			
+
 			Console.WriteLine($"{DateTime.UtcNow}: Received query {query}");
 
 			object result;
@@ -84,9 +86,9 @@ namespace MsdnSpy.Application
 		private RequestResult HandlePreferencesRequest(IDictionary<string, string> args)
 		{
 			if (!args.ContainsKey("chatId") ||
-				 !args.ContainsKey("category"))
+			    !args.ContainsKey("category"))
 				return new RequestResult(
-					@"Expected ""chatId"" and ""category"" parameters", 
+					@"Expected ""chatId"" and ""category"" parameters",
 					HttpStatusCode.BadRequest);
 
 			if (!long.TryParse(args["chatId"], out var chatId))
@@ -102,6 +104,13 @@ namespace MsdnSpy.Application
 				result = _storage.ChangeCategory(chatId, category);
 
 			Console.WriteLine($"{DateTime.UtcNow}: Handled preferences change: {category}");
+			return new RequestResult(result);
+		}
+
+		private RequestResult HandleHistoryRequest(IDictionary<string, string> args)
+		{
+			var chatId = Convert.ToInt64(args["chatId"]);
+			var result = _history.GetLastEntries(chatId);
 			return new RequestResult(result);
 		}
 	}

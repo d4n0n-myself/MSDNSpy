@@ -81,6 +81,19 @@ namespace MsdnSpy.Bot
 			}
 		}
 
+		public async void HandleCallbackQuery(object sender, CallbackQueryEventArgs args)
+		{
+			try
+			{
+				var bot = (ITelegramBotClient) sender;
+				await bot.AnswerCallbackQueryAsync(args.CallbackQuery.Id, "ebat ono raboteat nahooi");
+			}
+			catch (Exception e)
+			{
+				Console.WriteLine(e);
+			}
+		}
+		
 		private readonly Dictionary<string, IRequestHandler> _requestHandlers;
 
 		private static (string command, string args) ParseInput(string userInput)

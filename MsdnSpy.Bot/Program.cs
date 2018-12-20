@@ -22,7 +22,7 @@ namespace MsdnSpy.Bot
 				.GetSection("BotSettings").Get<BotSettings>();
 
 			MessageDispatcher = new MessageDispatcher(new IRequestHandler[]
-				{ new DocumentationGetter(), new PreferenceSender() });
+				{ new DocumentationGetter(), new PreferenceSender(), new HistoryHelper() });
 		}
 
 		private static void Main(string[] args)
@@ -54,7 +54,7 @@ namespace MsdnSpy.Bot
 			foreach (var bot in bots)
 			{
 				bot.OnMessage += MessageDispatcher.HandleMessage;
-
+				bot.OnCallbackQuery += MessageDispatcher.HandleCallbackQuery;
 				Task.Run(() => bot.StartReceiving());
 				Console.WriteLine($"Started bot with id {bot.BotId}");
 			}

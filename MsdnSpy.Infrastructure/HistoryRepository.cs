@@ -23,14 +23,17 @@ namespace MsdnSpy.Infrastructure
 			catch (Exception)
 			{
 				return false;
-			}	
+			}
 		}
 
-		public IEnumerable<HistoryEntry> GetLastEntries(long chatId)
+		public IEnumerable<string> GetLastEntries(long chatId)
 		{
-			return _context.History.Where(he => he.ChatId == chatId).Take(10);
+			return _context.History.Where(he => he.ChatId == chatId)
+				.OrderByDescending(he => he.DateTime)
+				.Take(10)
+				.Select(he => he.RequestQuery);
 		}
-		
+
 		private readonly DatabaseContext _context;
 
 		public int Save() => _context.SaveChanges();

@@ -6,6 +6,6 @@ namespace MsdnSpy.Infrastructure
 	public interface IHistoryRepository
 	{
 		bool AddEntry(long chatId, string query);
-		IEnumerable<HistoryEntry> GetLastEntries(long chatId);
+		IEnumerable<string> GetLastEntries(long chatId);
 	}
 }
