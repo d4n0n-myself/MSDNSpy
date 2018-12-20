@@ -2,11 +2,11 @@
 
 namespace MsdnSpy.Core
 {
-	public class User : Entity<int>
+	public class User : Entity<long>
 	{	
-		public User(int id) : base(id) { }
+		public User(long id) : base(id) { }
 
-		public string Name { get; set; }
-		public int Age { get; set; }
+		public string Preferences { get; set; }
+		public string Username { get; set; }
 	}
 }

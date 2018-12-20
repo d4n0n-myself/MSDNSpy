@@ -10,8 +10,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MsdnSpy.Infrastructure.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20181207132811_Initial")]
-    partial class Initial
+    [Migration("20181220062715_UpdateUserPreferences")]
+    partial class UpdateUserPreferences
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -26,9 +26,7 @@ namespace MsdnSpy.Infrastructure.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<int>("Age");
-
-                    b.Property<string>("Name");
+                    b.Property<string>("Username");
 
                     b.HasKey("Id");
 
@@ -40,13 +38,22 @@ namespace MsdnSpy.Infrastructure.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<long>("ChatId");
-
                     b.Property<string>("Preferences");
+
+                    b.Property<int?>("UserId");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("UserId");
+
                     b.ToTable("UserPreferences");
+                });
+
+            modelBuilder.Entity("MsdnSpy.Core.UserPreferences", b =>
+                {
+                    b.HasOne("MsdnSpy.Core.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId");
                 });
 #pragma warning restore 612, 618
         }
